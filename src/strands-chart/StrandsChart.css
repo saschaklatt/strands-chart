@@ -1,0 +1,9 @@
+.strands-chart {
+  border: 1px dashed red;
+}
+
+.strands-chart .strands-chart--strand {
+  fill: red;
+  stroke: white;
+  stroke-width: 1;
+}

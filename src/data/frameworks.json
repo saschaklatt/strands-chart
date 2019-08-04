@@ -1,0 +1,77 @@
+{
+  "bootstrap": {
+    "name": "Twitter Bootstrap"
+  },
+  "foundation": {
+    "name": "Foundation"
+  },
+  "dx": {
+    "name": "DirectX"
+  },
+  "jira": {
+    "name": "JIRA"
+  },
+  "confluence": {
+    "name": "Conluence"
+  },
+  "angular": {
+    "name": "Angular JS"
+  },
+  "react": {
+    "name": "React JS"
+  },
+  "d3": {
+    "name": "D3.js"
+  },
+  "phaser": {
+    "name": "Phaser"
+  },
+  "starling": {
+    "name": "Starling"
+  },
+  "flex": {
+    "name": "Adobe Flex"
+  },
+  "air": {
+    "name": "Adobe Air"
+  },
+  "mocha": {
+    "name": "Mocha"
+  },
+  "enzyme": {
+    "name": "Enzyme"
+  },
+  "jest": {
+    "name": "Jest"
+  },
+  "gatsby": {
+    "name": "Gatsby"
+  },
+  "jenkins": {
+    "name": "Jenkins"
+  },
+  "redux": {
+    "name": "Redux"
+  },
+  "gtm": {
+    "name": "Google Tag Manager"
+  },
+  "gulp": {
+    "name": "Gulp"
+  },
+  "grunt": {
+    "name": "Grunt"
+  },
+  "webpack": {
+    "name": "Webpack"
+  },
+  "laravel": {
+    "name": "Laravel"
+  },
+  "symfony": {
+    "name": "Symfony"
+  },
+  "zend": {
+    "name": "Zend"
+  }
+}

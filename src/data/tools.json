@@ -1,0 +1,32 @@
+{
+  "ps": {
+    "name": "Photoshop"
+  },
+  "ill": {
+    "name": "Illustrator"
+  },
+  "dsmax": {
+    "name": "DS Max"
+  },
+  "inks": {
+    "name": "Inkscape"
+  },
+  "spriter": {
+    "name": "Spriter"
+  },
+  "affdes": {
+    "name": "Affinity Designer"
+  },
+  "unity5": {
+    "name": "Unity 5"
+  },
+  "tdsmax": {
+    "name": "3ds Max"
+  },
+  "blender": {
+    "name": "Blender"
+  },
+  "docker": {
+    "name": "Docker"
+  }
+}

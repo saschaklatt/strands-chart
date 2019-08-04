@@ -1,0 +1,152 @@
+[
+  {
+    "year": 2003,
+    "data": {
+      "js": 1,
+      "php": 1,
+      "cpp": 2
+    }
+  },
+  {
+    "year": 2004,
+    "data": {
+      "js": 1,
+      "php": 1,
+      "cpp": 2,
+      "vba": 2,
+      "mysql": 2
+    }
+  },
+  {
+    "year": 2005,
+    "data": {
+      "js": 1,
+      "php": 2,
+      "cpp": 1,
+      "vba": 2,
+      "mysql": 2
+    }
+  },
+  {
+    "year": 2006,
+    "data": {
+      "js": 1,
+      "php": 2,
+      "mysql": 2
+    }
+  },
+  {
+    "year": 2007,
+    "data": {
+      "js": 1,
+      "php": 2,
+      "java": 1,
+      "mysql": 1
+    }
+  },
+  {
+    "year": 2008,
+    "data": {
+      "js": 1,
+      "php": 2,
+      "as3": 1,
+      "java": 2,
+      "mysql": 2
+    }
+  },
+  {
+    "year": 2009,
+    "data": {
+      "js": 1,
+      "php": 2,
+      "as3": 1,
+      "java": 2,
+      "mysql": 2,
+      "vb": 1,
+      "cs": 1
+    }
+  },
+  {
+    "year": 2010,
+    "data": {
+      "js": 1,
+      "php": 2,
+      "as3": 2,
+      "java": 2,
+      "mysql": 2
+    }
+  },
+  {
+    "year": 2011,
+    "data": {
+      "js": 1,
+      "php": 2,
+      "as3": 3,
+      "mysql": 2
+    }
+  },
+  {
+    "year": 2012,
+    "data": {
+      "js": 2,
+      "php": 3,
+      "as3": 4,
+      "mysql": 2
+    }
+  },
+  {
+    "year": 2013,
+    "data": {
+      "js": 2,
+      "php": 3,
+      "as3": 2,
+      "mysql": 3
+    }
+  },
+  {
+    "year": 2014,
+    "data": {
+      "js": 2,
+      "php": 3,
+      "as3": 1,
+      "mysql": 3
+    }
+  },
+  {
+    "year": 2015,
+    "data": {
+      "js": 3,
+      "php": 3,
+      "cs": 2,
+      "mysql": 3
+    }
+  },
+  {
+    "year": 2016,
+    "data": {
+      "js": 3,
+      "php": 3,
+      "cs": 1,
+      "mysql": 2
+    }
+  },
+  {
+    "year": 2017,
+    "data": {
+      "js": 4
+    }
+  },
+  {
+    "year": 2018,
+    "data": {
+      "js": 4
+    }
+  },
+  {
+    "year": 2019,
+    "data": {
+      "js": 4,
+      "php": 1
+    }
+  }
+]
