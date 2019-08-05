@@ -79,39 +79,25 @@ const getTupels = (sequence, width, height, direction) => {
 const tupelsToOutlineLeft = tupels => tupels.map(tupel => tupel[0])
 const tupelsToOutlineRight = tupels => tupels.map(tupel => tupel[1]).reverse()
 
-const tupelsToOutline = tupels => [
-  ...tupelsToOutlineLeft(tupels),
-  ...tupelsToOutlineRight(tupels),
-]
-
-const getPoints = (sequence, width, height, direction) => {
-  const tupels = getTupels(sequence, width, height, direction)
-  const outline = tupelsToOutline(tupels)
-  return outline.map(p => `${p[0]},${p[1]}`).join(" ")
-}
-
-const makeQuadBezierPath = points => {
-  const copy = [...points]
-  const p0 = copy.shift()
-  const p1 = copy.shift()
-  const c = [(p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2]
-  const q = [p0[0], c[1]]
-  const pathStart = `M ${p0[0]} ${p0[1]} Q ${q[0]} ${q[1]}, ${p1[0]} ${p1[1]}`
-  const path = copy.map(p => `T ${p[0]} ${p[1]}`).join(" ")
-
-  return `${pathStart} ${path}`
-}
-
+/**
+ * Get first control point.
+ */
 const getCubicC0 = (p0, p1, curving) => [
   p0[0],
   p0[1] + (p1[1] - p0[1]) * curving,
 ]
 
+/**
+ * Get second control point.
+ */
 const getCubicC1 = (p0, p1, curving) => [
   p1[0],
   p1[1] - (p1[1] - p0[1]) * curving,
 ]
 
+/**
+ * Convert point array into a space-separated string.
+ */
 const pointToString = p => `${p[0]} ${p[1]}`
 
 const makeCubicBezierPath = (points, curving = 1) =>
