@@ -1,11 +1,14 @@
 import React from "react"
 import "./StrandsChart.css"
 
+// TODO: If null separates a sequence into two pieces, the sequence just continues instead of being separated
 const EXAMPLE_SEQUENCES = [
-  [0, 1, 1, 2, 2, 2, 2, 2, 3, 3, 2, 4, 5, 0],
+  [null, null, 0, 1, 1, 2, 2, 2, 2, 2, 3, 3, 2, 4, 5, 0],
   [3, 4, 4, 4, 4, 2, 2, 2, 2, 0, 0, 1, 1],
-  [0, 2, 1, 5, 2, 0],
+  [null, null, null, 0, 2, 1, 5, 2, 0],
 ]
+
+const isNil = v => v === null || v === undefined
 
 const scaleLinear = (value, domain, range) => {
   // calculate pct in original range
@@ -32,8 +35,10 @@ const getAlignedX = (x, width, alignment) => {
   }
 }
 
-const getTupels = (sequence, width, height, alignment, offset, domainY) => {
-  // const domainY = [0, sequence.length - 1]
+/**
+ * Transform sequence values into pixel values in form of tuples.
+ */
+const getTuples = (sequence, width, height, alignment, offset, domainY) => {
   const rangeY = [height, 0]
 
   const domainX = [0, Math.max(...sequence)]
@@ -42,18 +47,21 @@ const getTupels = (sequence, width, height, alignment, offset, domainY) => {
   const scaleX = makeLinearScaler(domainX, rangeX)
   const scaleY = makeLinearScaler(domainY, rangeY)
 
-  return sequence.map((v, i) => {
+  return sequence.reduce((tuples, v, i) => {
+    if (isNil(v)) {
+      return tuples
+    }
     const x = scaleX(v)
     const y = scaleY(i)
     const alignedX = getAlignedX(x, width, alignment)
     const p1 = [alignedX[0] + offset, y]
     const p2 = [alignedX[1] + offset, y]
-    return [p1, p2]
-  })
+    return [...tuples, [p1, p2]]
+  }, [])
 }
 
-const tupelsToOutlineLeft = tupels => tupels.map(tupel => tupel[0])
-const tupelsToOutlineRight = tupels => tupels.map(tupel => tupel[1]).reverse()
+const tuplesToOutlineLeft = tuples => tuples.map(tuple => tuple[0])
+const tuplesToOutlineRight = tuples => tuples.map(tuple => tuple[1]).reverse()
 
 /**
  * Get first control point.
@@ -88,14 +96,13 @@ const makeCubicBezierPath = (points, curving = 1) =>
     return `${path} C ${C0} ${C1} ${P1}`
   }, "")
 
-const getPath = (sequence, width, height, align, offset, domainY) => {
-  const tupels = getTupels(sequence, width, height, align, offset, domainY)
-  const outlineLeft = tupelsToOutlineLeft(tupels)
-  const outlineRight = tupelsToOutlineRight(tupels)
-
-  const curving = 0.5
+const getPath = (sequence, width, height, align, offset, domainY, curving) => {
+  const tuples = getTuples(sequence, width, height, align, offset, domainY)
+  const outlineLeft = tuplesToOutlineLeft(tuples)
+  const outlineRight = tuplesToOutlineRight(tuples)
   const p0Left = pointToString(outlineLeft[0])
   const p0Right = pointToString(outlineRight[0])
+
   const pathStart = `M${p0Left}`
   const pathOutlineLeft = makeCubicBezierPath(outlineLeft, curving)
   const pathEdge = `L${p0Right}`
@@ -113,11 +120,12 @@ const Strand = ({
   offset,
   domainY,
   fill = "black",
+  curving = 0.5,
 }) => {
   return (
     <path
       className="strands-chart--strand"
-      d={getPath(sequence, width, height, align, offset, domainY)}
+      d={getPath(sequence, width, height, align, offset, domainY, curving)}
       fill={fill}
     />
   )
@@ -129,17 +137,21 @@ const getMaxSequenceLength = sequences =>
 const StrandsChart = ({ width, height, sequences = EXAMPLE_SEQUENCES }) => {
   const domainY = [0, getMaxSequenceLength(sequences)]
   const colors = ["red", "green", "blue"]
+  const padding = 20
+  const strandWidth = 100
   return (
     <svg className="strands-chart" width={width} height={height}>
       {sequences.map((sequence, idx) => (
         <Strand
+          key={idx}
           domainY={domainY}
           sequence={sequence}
-          offset={idx * 110}
-          width={100}
+          offset={idx * (strandWidth + padding)}
+          width={strandWidth}
           height={height}
           align="center"
           fill={colors[idx % colors.length]}
+          curving={0.5}
         />
       ))}
     </svg>
