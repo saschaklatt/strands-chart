@@ -6,6 +6,10 @@ import StrandModel, {
   makeSequenceExtender,
   makeLeftSnuggler,
   makeRightSnuggler,
+  getSingleSequenceWidth,
+  getMultiSequenceWidth,
+  getSequencesDomainX,
+  getSequencesDomainY,
 } from "./StrandModel"
 
 it("creates a StrandModel", () => {
@@ -319,5 +323,45 @@ describe("snuggling", () => {
       [11, 11],
       [null, null],
     ])
+  })
+})
+
+describe("sequence width", () => {
+  it("calculates a single sequence width", () => {
+    const seq = [1, -4, 9, null, 1]
+    const res = getSingleSequenceWidth(seq)
+    expect(res).toEqual(9)
+  })
+
+  it("calculates the total width of multiple sequences", () => {
+    const sequences = [[1, -4, 9, null, 1], [4, 1, 2, 3], [4, 5, 1, 0, null]]
+    const res = getMultiSequenceWidth(sequences)
+    expect(res).toEqual(18)
+  })
+
+  it("calculates the total width of multiple sequences with padding", () => {
+    const padding = 1
+    const sequences = [[1, -4, 9, null, 1], [4, 1, 2, 3], [4, 5, 1, 0, null]]
+    const res = getMultiSequenceWidth(sequences, padding)
+    expect(res).toEqual(20)
+  })
+})
+
+describe("domains", () => {
+  it("calculates the x-domain of multiple sequences", () => {
+    const padding = 1
+    const sequences = [[1, -4, 9, null, 1], [4, 1, 2, 3], [4, 5, 1, 0, null]]
+    const res = getSequencesDomainX(sequences, padding)
+    expect(res).toEqual([0, 20])
+  })
+
+  it("calculates the y-domain of multiple sequences", () => {
+    const sequences = [
+      [1, -4, 9, null, 1, null, 1, 2, 3, 4],
+      [4, 1, 2, 3],
+      [4, 5, 1, 0, null],
+    ]
+    const res = getSequencesDomainY(sequences)
+    expect(res).toEqual([10, 0])
   })
 })

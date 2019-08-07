@@ -52,7 +52,29 @@ const makeStrandSnuggler = dir => (baseStrand, pad = 0) => targetStrand => {
 export const makeLeftSnuggler = makeStrandSnuggler(-1)
 export const makeRightSnuggler = makeStrandSnuggler(1)
 
-export const getSequenceMax = sequence => Math.max(...sequence)
+export const getSingleSequenceWidth = sequence => Math.max(...sequence)
+
+export const getMultiSequenceWidth = (sequences, padding = 0) => {
+  const seqWidth = sequences.reduce(
+    (acc, seq) => acc + getSingleSequenceWidth(seq),
+    0
+  )
+  const padWidth = padding * (sequences.length - 1)
+  return seqWidth + padWidth
+}
+
+export const getSequencesDomainX = (sequences, padding = 0) => {
+  const width = getMultiSequenceWidth(sequences, padding)
+  return [0, width]
+}
+
+export const getSequencesDomainY = sequences => {
+  const maxLength = sequences.reduce((max, seq) => {
+    const v = seq.length
+    return v > max ? v : max
+  }, 0)
+  return [maxLength, 0]
+}
 
 const extendSequenceValue = dx => v => {
   if (isNil(dx)) {
@@ -70,7 +92,7 @@ export const makeSequenceExtender = dx => sequence =>
 export default function(sequence) {
   const state = {
     tuples: strandFromSequence(sequence),
-    max: getSequenceMax(sequence),
+    max: getSingleSequenceWidth(sequence),
   }
 
   const api = {
