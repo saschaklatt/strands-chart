@@ -1,8 +1,8 @@
-.strands-chart {
+.kebab-chart {
   border: 1px dashed red;
 }
 
-.strands-chart .strands-chart--item {
+.kebab-chart .kebab-chart--kebab {
   stroke: white;
   stroke-width: 1;
 }
