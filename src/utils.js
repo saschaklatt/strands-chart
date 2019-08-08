@@ -22,3 +22,8 @@ export const tuplesToOutlineLeft = tuples => tuples.map(tuple => tuple[0])
 
 export const tuplesToOutlineRight = tuples =>
   tuples.map(tuple => tuple[1]).reverse()
+
+export const reverse = ([head, ...tail]) =>
+  tail.length === 0 ? [head] : [...reverse(tail), head]
+
+export const pixel2str = p => `${p[0]} ${p[1]}`

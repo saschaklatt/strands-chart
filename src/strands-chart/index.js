@@ -1,21 +1,29 @@
 import React from "react"
 import "./StrandsChart.css"
 import EXAMPLE_SEQUENCES from "../data/example-sequences.json"
-import { sequences2strands, strands2pixels } from "../models/StrandModel"
+import {
+  sequences2strands,
+  makePixelConverter,
+  getPolygonPath,
+} from "../models/StrandModel"
 import { COLORS } from "../constants"
 
-const Strand = () => {
-  return <path className="strands-chart--strand" d="M10 10 L20 20 L30 10 Z" />
+const Strand = ({ path, fill }) => {
+  return <path className="strands-chart--strand" d={path} fill={fill} />
 }
 
 const StrandsChart = ({ width, height, sequences = EXAMPLE_SEQUENCES }) => {
-  const strands = sequences2strands(sequences)
+  const rangeX = [0, width]
+  const rangeY = [height, 0]
+  const getPixelValues = makePixelConverter(rangeX, rangeY)
+  const strands = sequences2strands(sequences, 0.2)
+  const paths = getPixelValues(strands).map(getPolygonPath)
   return (
     <svg className="strands-chart" width={width} height={height}>
-      {strands.map((strand, idx) => (
+      {paths.map((path, idx) => (
         <Strand
           key={idx}
-          tuples={strand}
+          path={path}
           fill={COLORS[idx % COLORS.length]}
           curving={0.5}
         />

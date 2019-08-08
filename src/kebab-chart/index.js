@@ -6,6 +6,7 @@ import {
   makeLinearScaler,
   tuplesToOutlineLeft,
   tuplesToOutlineRight,
+  pixel2str,
 } from "../utils"
 import EXAMPLE_SEQUENCES from "../data/example-sequences.json"
 import { COLORS } from "../constants"
@@ -63,20 +64,15 @@ const getCubicC1 = (p0, p1, curving) => [
   p1[1] - (p1[1] - p0[1]) * curving,
 ]
 
-/**
- * Convert point array into a space-separated string.
- */
-const pointToString = p => `${p[0]} ${p[1]}`
-
 const makeCubicBezierPath = (points, curving = 1) =>
   points.reduce((path, p, idx, arr) => {
     if (idx === 0) {
       return path
     }
     const p0 = arr[idx - 1]
-    const P1 = pointToString(p)
-    const C0 = pointToString(getCubicC0(p0, p, curving))
-    const C1 = pointToString(getCubicC1(p0, p, curving))
+    const P1 = pixel2str(p)
+    const C0 = pixel2str(getCubicC0(p0, p, curving))
+    const C1 = pixel2str(getCubicC1(p0, p, curving))
     return `${path} C ${C0} ${C1} ${P1}`
   }, "")
 
@@ -84,8 +80,8 @@ const getPath = (sequence, width, height, align, offset, domainY, curving) => {
   const tuples = getTuples(sequence, width, height, align, offset, domainY)
   const outlineLeft = tuplesToOutlineLeft(tuples)
   const outlineRight = tuplesToOutlineRight(tuples)
-  const p0Left = pointToString(outlineLeft[0])
-  const p0Right = pointToString(outlineRight[0])
+  const p0Left = pixel2str(outlineLeft[0])
+  const p0Right = pixel2str(outlineRight[0])
 
   const pathStart = `M${p0Left}`
   const pathOutlineLeft = makeCubicBezierPath(outlineLeft, curving)

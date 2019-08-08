@@ -1,4 +1,4 @@
-import { isNil, getHalf, makeLinearScaler } from "../utils"
+import { isNil, makeLinearScaler, reverse, pixel2str } from "../utils"
 
 const makeBaseTuple = v => (isNil(v) ? [null, null] : [0, v])
 
@@ -21,8 +21,6 @@ const moveTuple = dx => t => {
 
 export const moveStrand = (strand, dx) => strand.map(moveTuple(dx))
 
-const makeStrandMover = dx => strand => strand.map(moveTuple(dx))
-
 const makeStrandExtender = direction => strand => sequence => {
   return strand.map((t, i) => {
     const dx = sequence[i] * direction
@@ -36,6 +34,8 @@ export const makeLeftExtender = makeStrandExtender(-1)
 export const makeRightExtender = makeStrandExtender(1)
 
 const isNilDomain = ([p1, p2]) => isNil(p1) || isNil(p2)
+
+const withoutNil = ([p1, p2]) => !isNil(p1) && !isNil(p2)
 
 export const getDomainWidth = d =>
   isNilDomain(d) ? null : Math.abs(d[1] - d[0])
@@ -109,18 +109,8 @@ export const makeInitialSilhouette = (domainY, padding) => {
   return makeVerticalStrand(0, padding, maxY)
 }
 
-const strand2seq = strand => strand.map(getDomainWidth)
-
-const getHalfStrandWidth = strand => {
-  return getHalf(getSingleSequenceWidth(strand2seq(strand)))
-}
-
 const seqs2strands = (sequences, silhouette, pad, strands = [], i = 0) => {
   if (i >= sequences.length) {
-    // // move strands to the center
-    // const move = makeStrandMover(getHalfStrandWidth(strand2sequence(silhouette))) // TODO: use a compose function
-    // return strands.map(move)
-
     return strands
   }
 
@@ -128,7 +118,7 @@ const seqs2strands = (sequences, silhouette, pad, strands = [], i = 0) => {
   const dir = i % 2 ? 1 : -1
   const makeDirectedSnuggler = makeStrandSnuggler(dir)
   const snuggleWithSilhouette = makeDirectedSnuggler(silhouette)
-  const addPadding = makeSequenceExtender(pad * -dir)
+  const addPadding = makeSequenceExtender(pad)
 
   const extendSilhouette = makeStrandExtender(dir)(silhouette)
   const seqWithPadding = addPadding(seq)
@@ -155,11 +145,12 @@ const makeStrandFiller = maxY => strands => {
 export const sequences2strands = (sequences, padding = 0) => {
   const domainY = getSequencesDomainY(sequences)
   const silhouette = makeInitialSilhouette(domainY, padding)
-  const fillUp = makeStrandFiller(Math.max(...domainY))
+  const fillUp = makeStrandFiller(Math.max(...domainY)) // TODO: check if this is necessary
   return fillUp(seqs2strands(sequences, silhouette, padding))
 }
 
 const getLeftValues = strand => strand.map(tuple => tuple[0])
+
 const getRightValues = strand => strand.map(tuple => tuple[1])
 
 const getStrandsDomainX = strands => {
@@ -176,22 +167,42 @@ const getStrandsDomainX = strands => {
 const getStrandsDomainY = strands => {
   return strands.reduce(
     (domain, strand) => {
-      const max = Math.max(domain[1], strand.length)
+      const max = Math.max(domain[1], strand.length - 1)
       return [0, max]
     },
     [0, -Infinity]
   )
 }
 
-export const strands2pixels = (strands, rangeX, rangeY) => {
+const makePointToPixelConverter = (scaleX, scaleY) => ([x, y]) => [
+  isNil(x) ? null : scaleX(x),
+  isNil(x) ? null : scaleY(y), // Hint: isNil(x) is no mistake: no x means no value at all
+]
+
+const tuples2shape = tuples => [
+  ...getLeftValues(tuples),
+  ...reverse(getRightValues(tuples)),
+]
+
+export const makePixelConverter = (rangeX, rangeY) => strands => {
   const domainX = getStrandsDomainX(strands)
   const domainY = getStrandsDomainY(strands)
   const scaleX = makeLinearScaler(domainX, rangeX)
   const scaleY = makeLinearScaler(domainY, rangeY)
-  strands.map(strand => {
-    return strand.map(tuple => [
-      isNil(tuple[0]) ? null : scaleX(tuple[0]),
-      isNil(tuple[1]) ? null : scaleY(tuple[1]),
+  const pixel = makePointToPixelConverter(scaleX, scaleY)
+  return strands.map(strand => {
+    const pixelStrand = strand.map((tuple, idx) => [
+      pixel([tuple[0], idx]),
+      pixel([tuple[1], idx]),
     ])
+    return tuples2shape(pixelStrand).filter(withoutNil)
   })
 }
+
+export const getPolygonPath = pixels =>
+  pixels.reduce((path, pxl, idx, arr) => {
+    const cmd = idx === 0 ? "M" : "L"
+    const coords = pixel2str(pxl)
+    const end = idx >= arr.length - 1 ? " Z" : ""
+    return `${path} ${cmd}${coords}${end}`
+  }, "")
