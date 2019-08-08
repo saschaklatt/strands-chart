@@ -1,21 +1,14 @@
 import React from "react"
 import "./KebabChart.css"
-import { isNil, getMaxSequenceLength } from "../utils"
+import {
+  isNil,
+  getMaxSequenceLength,
+  makeLinearScaler,
+  tuplesToOutlineLeft,
+  tuplesToOutlineRight,
+} from "../utils"
 import EXAMPLE_SEQUENCES from "../data/example-sequences.json"
 import { COLORS } from "../constants"
-
-const scaleLinear = (value, domain, range) => {
-  // calculate pct in original range
-  const oDist = domain[1] - domain[0]
-  const pct = (value - domain[0]) / oDist
-
-  // apply pct value to target range
-  const tDist = range[1] - range[0]
-  return tDist * pct + range[0]
-}
-
-const makeLinearScaler = (domain, range) => value =>
-  scaleLinear(value, domain, range)
 
 const getAlignedX = (x, width, alignment) => {
   switch (alignment) {
@@ -53,9 +46,6 @@ const getTuples = (sequence, width, height, alignment, offset, domainY) => {
     return [...tuples, [p1, p2]]
   }, [])
 }
-
-const tuplesToOutlineLeft = tuples => tuples.map(tuple => tuple[0])
-const tuplesToOutlineRight = tuples => tuples.map(tuple => tuple[1]).reverse()
 
 /**
  * Get first control point.

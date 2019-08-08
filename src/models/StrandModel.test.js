@@ -12,7 +12,7 @@ import {
   getSequencesDomainY,
   getDomainWidth,
   getDomainCenter,
-  makeEmptySilhouette,
+  makeInitialSilhouette,
   sequences2strands,
 } from "./StrandModel"
 
@@ -73,6 +73,34 @@ describe("sequence to strand conversion", () => {
         [[-3, 0], [-1, 0], [-2, 0], [-3, 0]],
         [[1, 1], [1, 3], [1, 2], [1, 1]],
         [[-5, -4], [-3, -2], [-5, -3], [-5, -4]],
+      ])
+    })
+
+    it("creates strands with null values", () => {
+      const padding = 1
+      const sequences = [[3, 1, 2, 3], [null, 2, 1, 0], [1, 1, null, 1]]
+      const strands = sequences2strands(sequences, padding)
+
+      expect(strands).toEqual([
+        [[-3, 0], [-1, 0], [-2, 0], [-3, 0]],
+        [[null, null], [1, 3], [1, 2], [1, 1]],
+        [[-5, -4], [-3, -2], [null, null], [-5, -4]],
+      ])
+    })
+
+    it("creates fills up strands with different lengths", () => {
+      const padding = 1
+      const sequences = [
+        [null, null, 3, 1, 2, 3],
+        [null, 2, 1, 0],
+        [1, 1, 1, 2],
+      ]
+      const strands = sequences2strands(sequences, padding)
+
+      expect(strands).toEqual([
+        [[null, null], [null, null], [-3, 0], [-1, 0], [-2, 0], [-3, 0]],
+        [[null, null], [1, 3], [1, 2], [1, 1], [null, null], [null, null]],
+        [[-1, 0], [-1, 0], [-5, -4], [-4, -2], [null, null], [null, null]],
       ])
     })
   })
@@ -410,7 +438,7 @@ describe("domains", () => {
 describe("silhouette", () => {
   it("creates a vertical strand at zero", () => {
     const domainY = [0, 4]
-    const silhouette = makeEmptySilhouette(domainY)
-    expect(silhouette).toEqual([[0, 0], [0, 0], [0, 0], [0, 0]])
+    const silhouette = makeInitialSilhouette(domainY, 1)
+    expect(silhouette).toEqual([[0, 1], [0, 1], [0, 1], [0, 1]])
   })
 })

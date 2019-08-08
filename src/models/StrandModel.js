@@ -1,4 +1,4 @@
-import { isNil, getHalf } from "../utils"
+import { isNil, getHalf, makeLinearScaler } from "../utils"
 
 const makeBaseTuple = v => (isNil(v) ? [null, null] : [0, v])
 
@@ -94,18 +94,19 @@ const extendSequenceValue = dx => v => {
   if (isNil(v)) {
     return null
   }
-  return v + dx
+  const move = makeTupleValueMover(dx)
+  return move(v)
 }
 
 export const makeSequenceExtender = dx => sequence =>
   sequence.map(extendSequenceValue(dx))
 
-const makeVerticalStrand = (x, height) =>
-  Array.from({ length: height }, () => makeTuple(x, x))
+const makeVerticalStrand = (x, width, height) =>
+  Array.from({ length: height }, () => makeTuple(x, x + width))
 
-export const makeEmptySilhouette = domainY => {
+export const makeInitialSilhouette = (domainY, padding) => {
   const maxY = getDomainWidth(domainY)
-  return makeVerticalStrand(0, maxY)
+  return makeVerticalStrand(0, padding, maxY)
 }
 
 const strand2seq = strand => strand.map(getDomainWidth)
@@ -117,8 +118,7 @@ const getHalfStrandWidth = strand => {
 const seqs2strands = (sequences, silhouette, pad, strands = [], i = 0) => {
   if (i >= sequences.length) {
     // // move strands to the center
-    // // TODO: use a compose function
-    // const move = makeStrandMover(getHalfStrandWidth(strand2sequence(silhouette)))
+    // const move = makeStrandMover(getHalfStrandWidth(strand2sequence(silhouette))) // TODO: use a compose function
     // return strands.map(move)
 
     return strands
@@ -127,19 +127,71 @@ const seqs2strands = (sequences, silhouette, pad, strands = [], i = 0) => {
   const seq = sequences[i]
   const dir = i % 2 ? 1 : -1
   const makeDirectedSnuggler = makeStrandSnuggler(dir)
-  const padNoFirst = i === 0 ? 0 : pad
-  const snuggleWithSilhouette = makeDirectedSnuggler(silhouette, padNoFirst)
-  const strand = snuggleWithSilhouette(strandFromSequence(seq))
+  const snuggleWithSilhouette = makeDirectedSnuggler(silhouette)
+  const addPadding = makeSequenceExtender(pad * -dir)
 
   const extendSilhouette = makeStrandExtender(dir)(silhouette)
-  const newSilhouette = extendSilhouette(seq)
+  const seqWithPadding = addPadding(seq)
+  const newSilhouette = extendSilhouette(seqWithPadding)
 
+  const strand = snuggleWithSilhouette(strandFromSequence(seq))
   const newStrands = [...strands, strand]
+
   return seqs2strands(sequences, newSilhouette, pad, newStrands, i + 1)
+}
+
+const fillUpStrand = (strand, targetLength) => {
+  if (strand.length >= targetLength) {
+    return strand
+  }
+  const newStrand = [...strand, [null, null]]
+  return fillUpStrand(newStrand, targetLength)
+}
+
+const makeStrandFiller = maxY => strands => {
+  return strands.map(strand => fillUpStrand(strand, maxY))
 }
 
 export const sequences2strands = (sequences, padding = 0) => {
   const domainY = getSequencesDomainY(sequences)
-  const silhouette = makeEmptySilhouette(domainY)
-  return seqs2strands(sequences, silhouette, padding)
+  const silhouette = makeInitialSilhouette(domainY, padding)
+  const fillUp = makeStrandFiller(Math.max(...domainY))
+  return fillUp(seqs2strands(sequences, silhouette, padding))
+}
+
+const getLeftValues = strand => strand.map(tuple => tuple[0])
+const getRightValues = strand => strand.map(tuple => tuple[1])
+
+const getStrandsDomainX = strands => {
+  return strands.reduce(
+    (domain, strand) => {
+      const min = Math.min(...getLeftValues(strand))
+      const max = Math.max(...getRightValues(strand))
+      return [Math.min(domain[0], min), Math.max(domain[1], max)]
+    },
+    [Infinity, -Infinity]
+  )
+}
+
+const getStrandsDomainY = strands => {
+  return strands.reduce(
+    (domain, strand) => {
+      const max = Math.max(domain[1], strand.length)
+      return [0, max]
+    },
+    [0, -Infinity]
+  )
+}
+
+export const strands2pixels = (strands, rangeX, rangeY) => {
+  const domainX = getStrandsDomainX(strands)
+  const domainY = getStrandsDomainY(strands)
+  const scaleX = makeLinearScaler(domainX, rangeX)
+  const scaleY = makeLinearScaler(domainY, rangeY)
+  strands.map(strand => {
+    return strand.map(tuple => [
+      isNil(tuple[0]) ? null : scaleX(tuple[0]),
+      isNil(tuple[1]) ? null : scaleY(tuple[1]),
+    ])
+  })
 }
