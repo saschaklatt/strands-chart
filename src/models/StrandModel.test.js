@@ -1,4 +1,4 @@
-import StrandModel, {
+import {
   strandFromSequence,
   moveStrand,
   makeLeftExtender,
@@ -10,46 +10,71 @@ import StrandModel, {
   getMultiSequenceWidth,
   getSequencesDomainX,
   getSequencesDomainY,
+  getDomainWidth,
+  getDomainCenter,
+  makeEmptySilhouette,
+  sequences2strands,
 } from "./StrandModel"
 
-it("creates a StrandModel", () => {
-  const strand = new StrandModel([])
-  const data = strand.getData()
-  expect(data.tuples).toEqual([])
-})
+describe("sequence to strand conversion", () => {
+  describe("strandFromSequence", () => {
+    it("creates a strand from a sequence", () => {
+      const seq = [0, 1, 2, 3, 1]
+      const strand = strandFromSequence(seq)
+      expect(strand).toEqual([[0, 0], [0, 1], [0, 2], [0, 3], [0, 1]])
+    })
 
-describe("strandFromSequence", () => {
-  it("creates a strand from a sequence", () => {
-    const seq = [0, 1, 2, 3, 1]
-    const strand = strandFromSequence(seq)
-    expect(strand).toEqual([[0, 0], [0, 1], [0, 2], [0, 3], [0, 1]])
+    it("creates a tuple with null values", () => {
+      const seq = [null, null, 4, 3, 4, null, null]
+      const strand = strandFromSequence(seq)
+      expect(strand).toEqual([
+        [null, null],
+        [null, null],
+        [0, 4],
+        [0, 3],
+        [0, 4],
+        [null, null],
+        [null, null],
+      ])
+    })
+
+    it("creates a tuple with null values in the middle", () => {
+      const seq = [1, null, null, 4, 3, 4]
+      const strand = strandFromSequence(seq)
+      expect(strand).toEqual([
+        [0, 1],
+        [null, null],
+        [null, null],
+        [0, 4],
+        [0, 3],
+        [0, 4],
+      ])
+    })
   })
 
-  it("creates a tuple with null values", () => {
-    const seq = [null, null, 4, 3, 4, null, null]
-    const strand = strandFromSequence(seq)
-    expect(strand).toEqual([
-      [null, null],
-      [null, null],
-      [0, 4],
-      [0, 3],
-      [0, 4],
-      [null, null],
-      [null, null],
-    ])
-  })
+  describe("sequences2strands", () => {
+    it("creates and positions strands from raw sequences", () => {
+      const sequences = [[3, 1, 2, 3], [0, 2, 1, 0], [1, 1, 2, 1]]
+      const strands = sequences2strands(sequences)
 
-  it("creates a tuple with null values in the middle", () => {
-    const seq = [1, null, null, 4, 3, 4]
-    const strand = strandFromSequence(seq)
-    expect(strand).toEqual([
-      [0, 1],
-      [null, null],
-      [null, null],
-      [0, 4],
-      [0, 3],
-      [0, 4],
-    ])
+      expect(strands).toEqual([
+        [[-3, 0], [-1, 0], [-2, 0], [-3, 0]],
+        [[0, 0], [0, 2], [0, 1], [0, 0]],
+        [[-4, -3], [-2, -1], [-4, -2], [-4, -3]],
+      ])
+    })
+
+    it("creates strands with padding", () => {
+      const padding = 1
+      const sequences = [[3, 1, 2, 3], [0, 2, 1, 0], [1, 1, 2, 1]]
+      const strands = sequences2strands(sequences, padding)
+
+      expect(strands).toEqual([
+        [[-3, 0], [-1, 0], [-2, 0], [-3, 0]],
+        [[1, 1], [1, 3], [1, 2], [1, 1]],
+        [[-5, -4], [-3, -2], [-5, -3], [-5, -4]],
+      ])
+    })
   })
 })
 
@@ -175,8 +200,8 @@ describe("snuggling", () => {
       [null, null],
     ]
 
-    const snuggleWith = makeLeftSnuggler(baseStrand)
-    const result = snuggleWith(targetStrand)
+    const snuggleWith = makeLeftSnuggler(targetStrand)
+    const result = snuggleWith(baseStrand)
 
     expect(result).toEqual([
       [null, null],
@@ -225,8 +250,8 @@ describe("snuggling", () => {
       [null, null],
     ]
 
-    const snuggleWith = makeLeftSnuggler(baseStrand, padding)
-    const result = snuggleWith(targetStrand)
+    const snuggleWith = makeLeftSnuggler(targetStrand, padding)
+    const result = snuggleWith(baseStrand)
 
     expect(result).toEqual([
       [null, null],
@@ -268,8 +293,8 @@ describe("snuggling", () => {
       [null, null],
     ]
 
-    const snuggleWith = makeRightSnuggler(baseStrand)
-    const result = snuggleWith(targetStrand)
+    const snuggleWith = makeRightSnuggler(targetStrand)
+    const result = snuggleWith(baseStrand)
 
     expect(result).toEqual([
       [14, 16],
@@ -309,8 +334,8 @@ describe("snuggling", () => {
       [null, null],
     ]
 
-    const snuggleWith = makeRightSnuggler(baseStrand, padding)
-    const result = snuggleWith(targetStrand)
+    const snuggleWith = makeRightSnuggler(targetStrand, padding)
+    const result = snuggleWith(baseStrand)
 
     expect(result).toEqual([
       [15, 17],
@@ -363,5 +388,29 @@ describe("domains", () => {
     ]
     const res = getSequencesDomainY(sequences)
     expect(res).toEqual([10, 0])
+  })
+
+  it("returns the domain's width", () => {
+    expect(getDomainWidth([0, 10])).toEqual(10)
+    expect(getDomainWidth([5, 10])).toEqual(5)
+    expect(getDomainWidth([-5, 10])).toEqual(15)
+    expect(getDomainWidth([null, 10])).toEqual(null)
+    expect(getDomainWidth([10, null])).toEqual(null)
+  })
+
+  it("returns the domain's center", () => {
+    expect(getDomainCenter([0, 10])).toEqual(5)
+    expect(getDomainCenter([5, 10])).toEqual(7.5)
+    expect(getDomainCenter([-6, 10])).toEqual(2)
+    expect(getDomainCenter([null, 10])).toEqual(null)
+    expect(getDomainCenter([10, null])).toEqual(null)
+  })
+})
+
+describe("silhouette", () => {
+  it("creates a vertical strand at zero", () => {
+    const domainY = [0, 4]
+    const silhouette = makeEmptySilhouette(domainY)
+    expect(silhouette).toEqual([[0, 0], [0, 0], [0, 0], [0, 0]])
   })
 })
