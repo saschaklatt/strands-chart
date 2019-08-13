@@ -1,4 +1,7 @@
-import { isNil, makeLinearScaler, reverse, pixel2str } from "../utils"
+import { area } from "d3-shape"
+import { scaleLinear } from "d3-scale"
+import { isNil } from "../utils"
+import { COLORS } from "../constants"
 
 const makeBaseTuple = v => (isNil(v) ? [null, null] : [0, v])
 
@@ -11,16 +14,6 @@ const makeTupleValueMover = dx => v => (isNil(v) ? null : v + dx)
 
 const makeTupleValueSetter = x => v => (isNil(v) ? null : x)
 
-const moveTuple = dx => t => {
-  if (isNil(dx)) {
-    return t
-  }
-  const move = makeTupleValueMover(dx)
-  return t.map(move)
-}
-
-export const moveStrand = (strand, dx) => strand.map(moveTuple(dx))
-
 const makeStrandExtender = direction => strand => sequence => {
   return strand.map((t, i) => {
     const dx = sequence[i] * direction
@@ -29,19 +22,10 @@ const makeStrandExtender = direction => strand => sequence => {
   })
 }
 
-export const makeLeftExtender = makeStrandExtender(-1)
+export const isNilDomain = ([p1, p2]) => isNil(p1) || isNil(p2)
 
-export const makeRightExtender = makeStrandExtender(1)
-
-const isNilDomain = ([p1, p2]) => isNil(p1) || isNil(p2)
-
-const withoutNil = ([p1, p2]) => !isNil(p1) && !isNil(p2)
-
-export const getDomainWidth = d =>
+export const getDomainSize = d =>
   isNilDomain(d) ? null : Math.abs(d[1] - d[0])
-
-export const getDomainCenter = d =>
-  isNilDomain(d) ? null : d[0] + (d[1] - d[0]) / 2
 
 const makeStrandSnuggler = dir => (targetStrand, pad = 0) => baseStrand => {
   return baseStrand.map((t, i) => {
@@ -50,7 +34,7 @@ const makeStrandSnuggler = dir => (targetStrand, pad = 0) => baseStrand => {
     }
     const sideIdx = dir < 0 ? 0 : 1
     const x = targetStrand[i][sideIdx] + pad * dir
-    const w = getDomainWidth(t)
+    const w = getDomainSize(t)
     const left = dir < 0 ? x - w : x
     const right = dir < 0 ? x : x + w
     const setLeft = makeTupleValueSetter(left)
@@ -58,10 +42,6 @@ const makeStrandSnuggler = dir => (targetStrand, pad = 0) => baseStrand => {
     return [setLeft(t[0]), setRight(t[1])]
   })
 }
-
-export const makeLeftSnuggler = makeStrandSnuggler(-1)
-
-export const makeRightSnuggler = makeStrandSnuggler(1)
 
 export const getSingleSequenceWidth = sequence => Math.max(...sequence)
 
@@ -72,19 +52,6 @@ export const getMultiSequenceWidth = (sequences, padding = 0) => {
   )
   const padWidth = padding * (sequences.length - 1)
   return seqWidth + padWidth
-}
-
-export const getSequencesDomainX = (sequences, padding = 0) => {
-  const width = getMultiSequenceWidth(sequences, padding)
-  return [0, width]
-}
-
-export const getSequencesDomainY = sequences => {
-  const maxLength = sequences.reduce((max, seq) => {
-    const v = seq.length
-    return v > max ? v : max
-  }, 0)
-  return [maxLength, 0]
 }
 
 const extendSequenceValue = dx => v => {
@@ -105,7 +72,7 @@ const makeVerticalStrand = (x, width, height) =>
   Array.from({ length: height }, () => makeTuple(x, x + width))
 
 export const makeInitialSilhouette = (domainY, padding) => {
-  const maxY = getDomainWidth(domainY)
+  const maxY = getDomainSize(domainY)
   return makeVerticalStrand(0, padding, maxY)
 }
 
@@ -125,36 +92,29 @@ const seqs2strands = (sequences, silhouette, pad, strands = [], i = 0) => {
   const newSilhouette = extendSilhouette(seqWithPadding)
 
   const strand = snuggleWithSilhouette(strandFromSequence(seq))
+    .map(attachIndex)
+    .filter(withoutNullValues)
   const newStrands = [...strands, strand]
 
   return seqs2strands(sequences, newSilhouette, pad, newStrands, i + 1)
 }
 
-const fillUpStrand = (strand, targetLength) => {
-  if (strand.length >= targetLength) {
-    return strand
-  }
-  const newStrand = [...strand, [null, null]]
-  return fillUpStrand(newStrand, targetLength)
-}
+const attachIndex = (tuple, idx) => [...tuple, idx]
 
-const makeStrandFiller = maxY => strands => {
-  return strands.map(strand => fillUpStrand(strand, maxY))
-}
+const withoutNullValues = tuple => !isNilDomain(tuple)
 
 export const sequences2strands = (sequences, padding = 0) => {
   const domainY = getSequencesDomainY(sequences)
   const silhouette = makeInitialSilhouette(domainY, padding)
-  const fillUp = makeStrandFiller(Math.max(...domainY)) // TODO: check if this is necessary
-  return fillUp(seqs2strands(sequences, silhouette, padding))
+  return seqs2strands(sequences, silhouette, padding)
 }
 
 const getLeftValues = strand => strand.map(tuple => tuple[0])
 
 const getRightValues = strand => strand.map(tuple => tuple[1])
 
-const getStrandsDomainX = strands => {
-  return strands.reduce(
+export const getStrandsDomainX = strands =>
+  strands.reduce(
     (domain, strand) => {
       const min = Math.min(...getLeftValues(strand))
       const max = Math.max(...getRightValues(strand))
@@ -162,47 +122,49 @@ const getStrandsDomainX = strands => {
     },
     [Infinity, -Infinity]
   )
-}
 
-const getStrandsDomainY = strands => {
-  return strands.reduce(
-    (domain, strand) => {
-      const max = Math.max(domain[1], strand.length - 1)
-      return [0, max]
-    },
-    [0, -Infinity]
-  )
-}
-
-const makePointToPixelConverter = (scaleX, scaleY) => ([x, y]) => [
-  isNil(x) ? null : scaleX(x),
-  isNil(x) ? null : scaleY(y), // Hint: isNil(x) is no mistake: no x means no value at all
+// TODO: use just one method: getSequencesDomainY() or getStrandsDomainY()
+const getSequencesDomainY = sequences => [
+  sequences.reduce((max, seq) => Math.max(max, seq.length), 0),
+  0,
 ]
 
-const tuples2shape = tuples => [
-  ...getLeftValues(tuples),
-  ...reverse(getRightValues(tuples)),
+export const getStrandsDomainY = strands => [
+  0,
+  strands.reduce((max, strand) => Math.max(max, strand.length - 1), 0),
 ]
 
-export const makePixelConverter = (rangeX, rangeY) => strands => {
+export const makeAreaConverter = (scaleX, scaleY, curving) => strand =>
+  area()
+    .curve(curving)
+    .x0(d => scaleX(d[0]))
+    .x1(d => scaleX(d[1]))
+    .y(d => scaleY(d[2]))(strand)
+
+export const getColorByIndex = idx => COLORS[idx % COLORS.length]
+
+export const getStrandAreas = ({
+  sequences,
+  width,
+  height,
+  curving,
+  padding,
+}) => {
+  const strands = sequences2strands(sequences, padding) // TODO: define padding in pixels
+
+  const rangeX = [0, width]
+  const rangeY = [height, 0]
   const domainX = getStrandsDomainX(strands)
   const domainY = getStrandsDomainY(strands)
-  const scaleX = makeLinearScaler(domainX, rangeX)
-  const scaleY = makeLinearScaler(domainY, rangeY)
-  const pixel = makePointToPixelConverter(scaleX, scaleY)
-  return strands.map(strand => {
-    const pixelStrand = strand.map((tuple, idx) => [
-      pixel([tuple[0], idx]),
-      pixel([tuple[1], idx]),
-    ])
-    return tuples2shape(pixelStrand).filter(withoutNil)
-  })
-}
 
-export const getPolygonPath = pixels =>
-  pixels.reduce((path, pxl, idx, arr) => {
-    const cmd = idx === 0 ? "M" : "L"
-    const coords = pixel2str(pxl)
-    const end = idx >= arr.length - 1 ? " Z" : ""
-    return `${path} ${cmd}${coords}${end}`
-  }, "")
+  const scaleX = scaleLinear()
+    .domain(domainX)
+    .range(rangeX)
+
+  const scaleY = scaleLinear()
+    .domain(domainY)
+    .range(rangeY)
+
+  const toArea = makeAreaConverter(scaleX, scaleY, curving)
+  return strands.map(toArea)
+}

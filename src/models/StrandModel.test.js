@@ -14,6 +14,7 @@ import {
   getDomainCenter,
   makeInitialSilhouette,
   sequences2strands,
+  getCubics,
 } from "./StrandModel"
 
 describe("sequence to strand conversion", () => {
@@ -441,5 +442,16 @@ describe("silhouette", () => {
     const domainY = [0, 4]
     const silhouette = makeInitialSilhouette(domainY, 1)
     expect(silhouette).toEqual([[0, 1], [0, 1], [0, 1], [0, 1]])
+  })
+})
+
+describe("curving", () => {
+  it.only("curves", () => {
+    const pxlA = [11, 2]
+    const pxlB = [11, 10]
+    const pxlC = [1, 12]
+    const gamma = getCubics(pxlA, pxlB, pxlC, 1.5)
+    // expect(gamma).toEqual(0.6867003834725078)
+    expect(gamma).toEqual([1, 1])
   })
 })
