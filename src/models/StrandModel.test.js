@@ -1,20 +1,11 @@
 import {
   strandFromSequence,
-  moveStrand,
-  makeLeftExtender,
-  makeRightExtender,
-  makeSequenceExtender,
-  makeLeftSnuggler,
-  makeRightSnuggler,
   getSingleSequenceWidth,
   getMultiSequenceWidth,
-  getSequencesDomainX,
-  getSequencesDomainY,
-  getDomainWidth,
-  getDomainCenter,
+  getDomainSize,
   makeInitialSilhouette,
   sequences2strands,
-  getCubics,
+  makeStrandSnuggler,
 } from "./StrandModel"
 
 describe("sequence to strand conversion", () => {
@@ -59,9 +50,9 @@ describe("sequence to strand conversion", () => {
       const strands = sequences2strands(sequences)
 
       expect(strands).toEqual([
-        [[-3, 0], [-1, 0], [-2, 0], [-3, 0]],
-        [[0, 0], [0, 2], [0, 1], [0, 0]],
-        [[-4, -3], [-2, -1], [-4, -2], [-4, -3]],
+        [[-3, 0, 0], [-1, 0, 1], [-2, 0, 2], [-3, 0, 3]],
+        [[0, 0, 0], [0, 2, 1], [0, 1, 2], [0, 0, 3]],
+        [[-4, -3, 0], [-2, -1, 1], [-4, -2, 2], [-4, -3, 3]],
       ])
     })
 
@@ -71,131 +62,24 @@ describe("sequence to strand conversion", () => {
       const strands = sequences2strands(sequences, padding)
 
       expect(strands).toEqual([
-        [[-3, 0], [-1, 0], [-2, 0], [-3, 0]],
-        [[1, 1], [1, 3], [1, 2], [1, 1]],
-        [[-5, -4], [-3, -2], [-5, -3], [-5, -4]],
-        [[2, 3], [4, 6], [3, 5], [2, 4]],
+        [[-3, 0, 0], [-1, 0, 1], [-2, 0, 2], [-3, 0, 3]],
+        [[1, 1, 0], [1, 3, 1], [1, 2, 2], [1, 1, 3]],
+        [[-5, -4, 0], [-3, -2, 1], [-5, -3, 2], [-5, -4, 3]],
+        [[2, 3, 0], [4, 6, 1], [3, 5, 2], [2, 4, 3]],
       ])
     })
 
-    it("creates strands with null values", () => {
+    it("creates strands with and filter null values", () => {
       const padding = 1
       const sequences = [[3, 1, 2, 3], [null, 2, 1, 0], [1, 1, null, 1]]
       const strands = sequences2strands(sequences, padding)
 
       expect(strands).toEqual([
-        [[-3, 0], [-1, 0], [-2, 0], [-3, 0]],
-        [[null, null], [1, 3], [1, 2], [1, 1]],
-        [[-5, -4], [-3, -2], [null, null], [-5, -4]],
+        [[-3, 0, 0], [-1, 0, 1], [-2, 0, 2], [-3, 0, 3]],
+        [[1, 3, 1], [1, 2, 2], [1, 1, 3]],
+        [[-5, -4, 0], [-3, -2, 1], [-5, -4, 3]],
       ])
     })
-
-    it("creates fills up strands with different lengths", () => {
-      const padding = 1
-      const sequences = [
-        [null, null, 3, 1, 2, 3],
-        [null, 2, 1, 0],
-        [1, 1, 1, 2],
-      ]
-      const strands = sequences2strands(sequences, padding)
-
-      expect(strands).toEqual([
-        [[null, null], [null, null], [-3, 0], [-1, 0], [-2, 0], [-3, 0]],
-        [[null, null], [1, 3], [1, 2], [1, 1], [null, null], [null, null]],
-        [[-1, 0], [-1, 0], [-5, -4], [-4, -2], [null, null], [null, null]],
-      ])
-    })
-  })
-})
-
-describe("moveStrand", () => {
-  const mockStrand = () => [
-    [null, null],
-    [0, 0],
-    [0, 4],
-    [0, 3],
-    [null, null],
-    [0, 0],
-    [null, null],
-  ]
-
-  it("moves a strand by the given value", () => {
-    const dx = 10
-    const mock = mockStrand()
-    const strand = moveStrand(mock, dx)
-    expect(strand).toEqual([
-      [null, null],
-      [10, 10],
-      [10, 14],
-      [10, 13],
-      [null, null],
-      [10, 10],
-      [null, null],
-    ])
-  })
-
-  it("doesn't move the strand by a null value", () => {
-    const dx = null
-    const mock = mockStrand()
-    const strand = moveStrand(mock, dx)
-    expect(strand).toEqual(mock)
-  })
-
-  it("doesn't move the strand by an undefined value", () => {
-    const mock = mockStrand()
-    const strand = moveStrand(mock)
-    expect(strand).toEqual(mock)
-  })
-})
-
-describe("extending", () => {
-  const mockStrand = () => [
-    [null, null],
-    [10, 10],
-    [10, 14],
-    [10, 13],
-    [null, null],
-    [10, 10],
-    [null, null],
-  ]
-
-  it("extends a tuple to the left", () => {
-    const sequence = [1, 3, null, 0, null, 5, 1]
-    const mock = mockStrand()
-    const extendLeft = makeLeftExtender(mock)
-    const strand = extendLeft(sequence)
-    expect(strand).toEqual([
-      [null, null],
-      [7, 10],
-      [10, 14],
-      [10, 13],
-      [null, null],
-      [5, 10],
-      [null, null],
-    ])
-  })
-
-  it("extends a tuple to the right", () => {
-    const sequence = [1, 3, null, 0, null, 5, 1]
-    const mock = mockStrand()
-    const extendRight = makeRightExtender(mock)
-    const strand = extendRight(sequence)
-    expect(strand).toEqual([
-      [null, null],
-      [10, 13],
-      [10, 14],
-      [10, 13],
-      [null, null],
-      [10, 15],
-      [null, null],
-    ])
-  })
-
-  it("extends a sequence", () => {
-    const sequence = [1, 3, null, 0, null, 5, 1]
-    const extend = makeSequenceExtender(1)
-    const result = extend(sequence)
-    expect(result).toEqual([2, 4, null, 1, null, 6, 2])
   })
 })
 
@@ -230,7 +114,7 @@ describe("snuggling", () => {
       [null, null],
     ]
 
-    const snuggleWith = makeLeftSnuggler(targetStrand)
+    const snuggleWith = makeStrandSnuggler(-1)(targetStrand)
     const result = snuggleWith(baseStrand)
 
     expect(result).toEqual([
@@ -280,7 +164,8 @@ describe("snuggling", () => {
       [null, null],
     ]
 
-    const snuggleWith = makeLeftSnuggler(targetStrand, padding)
+    const snuggleLeft = makeStrandSnuggler(-1)
+    const snuggleWith = snuggleLeft(targetStrand, padding)
     const result = snuggleWith(baseStrand)
 
     expect(result).toEqual([
@@ -323,7 +208,8 @@ describe("snuggling", () => {
       [null, null],
     ]
 
-    const snuggleWith = makeRightSnuggler(targetStrand)
+    const snuggleRight = makeStrandSnuggler(1)
+    const snuggleWith = snuggleRight(targetStrand)
     const result = snuggleWith(baseStrand)
 
     expect(result).toEqual([
@@ -364,7 +250,8 @@ describe("snuggling", () => {
       [null, null],
     ]
 
-    const snuggleWith = makeRightSnuggler(targetStrand, padding)
+    const snuggleRight = makeStrandSnuggler(1)
+    const snuggleWith = snuggleRight(targetStrand, padding)
     const result = snuggleWith(baseStrand)
 
     expect(result).toEqual([
@@ -403,37 +290,12 @@ describe("sequence width", () => {
 })
 
 describe("domains", () => {
-  it("calculates the x-domain of multiple sequences", () => {
-    const padding = 1
-    const sequences = [[1, -4, 9, null, 1], [4, 1, 2, 3], [4, 5, 1, 0, null]]
-    const res = getSequencesDomainX(sequences, padding)
-    expect(res).toEqual([0, 20])
-  })
-
-  it("calculates the y-domain of multiple sequences", () => {
-    const sequences = [
-      [1, -4, 9, null, 1, null, 1, 2, 3, 4],
-      [4, 1, 2, 3],
-      [4, 5, 1, 0, null],
-    ]
-    const res = getSequencesDomainY(sequences)
-    expect(res).toEqual([10, 0])
-  })
-
   it("returns the domain's width", () => {
-    expect(getDomainWidth([0, 10])).toEqual(10)
-    expect(getDomainWidth([5, 10])).toEqual(5)
-    expect(getDomainWidth([-5, 10])).toEqual(15)
-    expect(getDomainWidth([null, 10])).toEqual(null)
-    expect(getDomainWidth([10, null])).toEqual(null)
-  })
-
-  it("returns the domain's center", () => {
-    expect(getDomainCenter([0, 10])).toEqual(5)
-    expect(getDomainCenter([5, 10])).toEqual(7.5)
-    expect(getDomainCenter([-6, 10])).toEqual(2)
-    expect(getDomainCenter([null, 10])).toEqual(null)
-    expect(getDomainCenter([10, null])).toEqual(null)
+    expect(getDomainSize([0, 10])).toEqual(10)
+    expect(getDomainSize([5, 10])).toEqual(5)
+    expect(getDomainSize([-5, 10])).toEqual(15)
+    expect(getDomainSize([null, 10])).toEqual(null)
+    expect(getDomainSize([10, null])).toEqual(null)
   })
 })
 
@@ -442,16 +304,5 @@ describe("silhouette", () => {
     const domainY = [0, 4]
     const silhouette = makeInitialSilhouette(domainY, 1)
     expect(silhouette).toEqual([[0, 1], [0, 1], [0, 1], [0, 1]])
-  })
-})
-
-describe("curving", () => {
-  it.only("curves", () => {
-    const pxlA = [11, 2]
-    const pxlB = [11, 10]
-    const pxlC = [1, 12]
-    const gamma = getCubics(pxlA, pxlB, pxlC, 1.5)
-    // expect(gamma).toEqual(0.6867003834725078)
-    expect(gamma).toEqual([1, 1])
   })
 })

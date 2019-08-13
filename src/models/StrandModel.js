@@ -27,7 +27,10 @@ export const isNilDomain = ([p1, p2]) => isNil(p1) || isNil(p2)
 export const getDomainSize = d =>
   isNilDomain(d) ? null : Math.abs(d[1] - d[0])
 
-const makeStrandSnuggler = dir => (targetStrand, pad = 0) => baseStrand => {
+export const makeStrandSnuggler = dir => (
+  targetStrand,
+  pad = 0
+) => baseStrand => {
   return baseStrand.map((t, i) => {
     if (isNilDomain(t) || isNilDomain(targetStrand[i])) {
       return t
