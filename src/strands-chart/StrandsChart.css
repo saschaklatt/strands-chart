@@ -1,15 +1,16 @@
 .strands-chart {
   width: 100%;
+  max-width: 1200px;
   display: flex;
   flex-direction: row;
-  margin: 20px;
 }
 
 .strands-chart--lined {
   position: relative;
   display: flex;
   flex-direction: row;
-  flex: 1 0 0;
+  flex: 1 0 0px;
+  min-width: 0;
 }
 
 .strands-chart--lines,
@@ -24,7 +25,7 @@
 .strands-chart--lines {
   position: absolute;
   width: 100%;
-  z-index: 0;
+  z-index: -1;
 }
 
 .strands-chart--lines > span {
@@ -33,7 +34,7 @@
 }
 
 .strands-chart--dates {
-  flex: 0 1 0;
+  flex: 0 1 auto;
 }
 
 .strands-chart--dates > span {
@@ -44,14 +45,21 @@
 }
 
 .strands-chart--positions {
-  flex: 1 1 auto;
-  align-items: flex-end;
-  z-index: 1;
+  flex: 1 1 0;
+  overflow: hidden;
 }
 
 .strands-chart--positions > div {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex: 1 0 auto;
+}
+
+.strands-chart--positions > div > div {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
   text-align: right;
 }
 
@@ -61,8 +69,7 @@
 }
 
 .strands-chart svg {
-  flex: 1 0 auto;
-  z-index: 1;
+  flex: 0 0 auto;
 }
 
 .strands-chart .strands-chart--strand {

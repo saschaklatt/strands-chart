@@ -7,26 +7,10 @@ import { getBemClassName } from "../utils"
 
 const bem = getBemClassName("strands-chart")
 
-const SVGTimePeriods = ({ periods, width }) => (
-  <g className={bem("periods")}>
-    {periods.map(
-      ({ position, yLine, yYear, yPosition, year, organisation }) => (
-        <g className={bem("period")} key={position}>
-          <line x1="50" x2={width} y1={yLine} y2={yLine} stroke="black" />
-          <text x="0" y={yYear} fill="black">
-            {year}
-          </text>
-          <text x="200" y={yPosition}>{`${position} @ ${organisation}`}</text>
-        </g>
-      )
-    )}
-  </g>
-)
-
 const Dates = ({ periods }) => (
   <div className={bem("dates")}>
     {periods.map(({ year, flexYear, position }) => (
-      <span key={position} style={{ flex: `${flexYear}px 0 0` }}>
+      <span key={position} style={{ height: `${flexYear}px` }}>
         {year}
       </span>
     ))}
@@ -36,7 +20,7 @@ const Dates = ({ periods }) => (
 const Positions = ({ periods }) => (
   <div className={bem("positions")}>
     {periods.map(({ flexYear, position, organisation }) => (
-      <div key={position} style={{ flex: `${flexYear}px 0 0` }}>
+      <div key={position} style={{ height: `${flexYear}px` }}>
         <div>
           <span>{position}</span>
           <span>{`@ ${organisation}`}</span>
@@ -49,7 +33,7 @@ const Positions = ({ periods }) => (
 const Lines = ({ periods }) => (
   <div className={bem("lines")}>
     {periods.map(({ flexYear, position }) => (
-      <span key={position} style={{ flex: `${flexYear}px 0 0` }} />
+      <span key={position} style={{ height: `${flexYear}px` }} />
     ))}
   </div>
 )
@@ -73,12 +57,7 @@ const StrandsChart = props => (
     <Dates {...props} />
     <div className={bem("lined")}>
       <Lines {...props} />
-      <svg
-        width={props.width}
-        height={props.height}
-        style={{ maxWidth: `${props.width}px` }}
-      >
-        {/* <SVGTimePeriods {...props} /> */}
+      <svg width={props.width} height={props.height}>
         <Strands {...props} />
       </svg>
       <Positions {...props} />

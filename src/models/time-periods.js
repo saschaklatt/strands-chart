@@ -1,5 +1,5 @@
 import { min } from "d3-array"
-import { scaleLinear, scaleTime } from "d3-scale"
+import { scaleTime } from "d3-scale"
 import { timeFormat, timeParse } from "d3-time-format"
 import { isLast } from "../utils"
 
@@ -66,7 +66,7 @@ export const importTimePeriods = ({ periods, width, height, today }) => {
       const nextY = isLast(arr, idx) ? rangeY[1] : arr[idx + 1].yLine
       return {
         ...period,
-        flexYear: Math.round(period.yLine - nextY - 1),
+        flexYear: Math.round(period.yLine - nextY),
       }
     })
 }
