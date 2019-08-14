@@ -1,8 +1,11 @@
+import { isNil } from "../utils"
+
 /**
  * Algorithm:
- * - sort raw data by year
- * - make a sequence array for each language
- * - replace null-values in the middle with 0-values
+ * [√] sort raw data by year
+ * [√] make a sequence array for each language
+ * [√] replace null-values in the middle with 0-values
+ * [ ] sort strands by surface area
  *
  *
  * Target format:
@@ -54,9 +57,18 @@ const putValuesIntoList = keys => (acc, d) => {
   return acc
 }
 
+const nil2zero = v => (isNil(v) || isNaN(v) ? 0 : v)
+
+const sum = (a, b) => nil2zero(a) + nil2zero(b)
+
+const getSurfaceArea = strand => strand.reduce(sum, 0)
+
+const descSurfaceArea = selector => (a, b) =>
+  getSurfaceArea(selector(b)) - getSurfaceArea(selector(a))
+
 export const importData = input => {
   const sorted = [...input].sort(asc(getYear))
   const keys = filterKeys(sorted)
   const keyListObj = sorted.reduce(putValuesIntoList(keys), keysToObject(keys))
-  return toArray(keyListObj)
+  return toArray(keyListObj).sort(descSurfaceArea(getData))
 }
