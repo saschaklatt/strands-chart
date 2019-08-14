@@ -6,4 +6,6 @@ export const COLORS = Object.freeze([
   "#B672BC",
   "#39638D",
   "#F8F025",
+  "#4E6ED6",
+  "#72BC78",
 ])

@@ -2,7 +2,8 @@
   border: 1px dashed black;
 }
 
-.strands-chart .strands-chart--item {
-  stroke: white;
-  stroke-width: 1;
+.strands-chart .strands-chart--strand {
+  stroke: #fdfff0;
+  stroke-width: 5px;
+  opacity: 0.9;
 }

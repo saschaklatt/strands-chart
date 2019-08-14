@@ -3,6 +3,8 @@ export const getMaxSequenceLength = sequences =>
 
 export const isNil = v => v === null || v === undefined
 
+export const isNotNil = v => v !== null && v !== undefined
+
 export const getHalf = v => v / 2
 
 export const scaleLinear = (value, domain, range) => {

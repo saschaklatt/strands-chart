@@ -168,6 +168,5 @@ export const getStrandAreas = ({
     .domain(domainY)
     .range(rangeY)
 
-  const toArea = makeAreaConverter(scaleX, scaleY, curving)
-  return strands.map(toArea)
+  return strands.map(makeAreaConverter(scaleX, scaleY, curving))
 }
