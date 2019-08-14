@@ -27,16 +27,13 @@ export const isNilDomain = ([p1, p2]) => isNil(p1) || isNil(p2)
 export const getDomainSize = d =>
   isNilDomain(d) ? null : Math.abs(d[1] - d[0])
 
-export const makeStrandSnuggler = dir => (
-  targetStrand,
-  pad = 0
-) => baseStrand => {
-  return baseStrand.map((t, i) => {
+export const makeStrandSnuggler = dir => targetStrand => baseStrand =>
+  baseStrand.map((t, i) => {
     if (isNilDomain(t) || isNilDomain(targetStrand[i])) {
       return t
     }
     const sideIdx = dir < 0 ? 0 : 1
-    const x = targetStrand[i][sideIdx] + pad * dir
+    const x = targetStrand[i][sideIdx]
     const w = getDomainSize(t)
     const left = dir < 0 ? x - w : x
     const right = dir < 0 ? x : x + w
@@ -44,17 +41,15 @@ export const makeStrandSnuggler = dir => (
     const setRight = makeTupleValueSetter(right)
     return [setLeft(t[0]), setRight(t[1])]
   })
-}
 
 export const getSingleSequenceWidth = sequence => Math.max(...sequence)
 
-export const getMultiSequenceWidth = (sequences, padding = 0) => {
+export const getMultiSequenceWidth = sequences => {
   const seqWidth = sequences.reduce(
     (acc, seq) => acc + getSingleSequenceWidth(seq),
     0
   )
-  const padWidth = padding * (sequences.length - 1)
-  return seqWidth + padWidth
+  return seqWidth
 }
 
 const extendSequenceValue = dx => v => {
@@ -71,15 +66,13 @@ const extendSequenceValue = dx => v => {
 export const makeSequenceExtender = dx => sequence =>
   sequence.map(extendSequenceValue(dx))
 
-const makeVerticalStrand = (x, width, height) =>
-  Array.from({ length: height }, () => makeTuple(x, x + width))
+const makeVerticalStrand = (x, height) =>
+  Array.from({ length: height }, () => makeTuple(x, x))
 
-export const makeInitialSilhouette = (domainY, padding) => {
-  const maxY = getDomainSize(domainY)
-  return makeVerticalStrand(0, padding, maxY)
-}
+export const makeInitialSilhouette = domainY =>
+  makeVerticalStrand(0, getDomainSize(domainY))
 
-const seqs2strands = (sequences, silhouette, pad, strands = [], i = 0) => {
+const seqs2strands = (sequences, silhouette, strands = [], i = 0) => {
   if (i >= sequences.length) {
     return strands
   }
@@ -88,28 +81,26 @@ const seqs2strands = (sequences, silhouette, pad, strands = [], i = 0) => {
   const dir = i % 2 ? 1 : -1
   const makeDirectedSnuggler = makeStrandSnuggler(dir)
   const snuggleWithSilhouette = makeDirectedSnuggler(silhouette)
-  const addPadding = makeSequenceExtender(pad)
 
   const extendSilhouette = makeStrandExtender(dir)(silhouette)
-  const seqWithPadding = addPadding(seq)
-  const newSilhouette = extendSilhouette(seqWithPadding)
+  const newSilhouette = extendSilhouette(seq)
 
   const strand = snuggleWithSilhouette(strandFromSequence(seq))
     .map(attachIndex)
     .filter(withoutNullValues)
   const newStrands = [...strands, strand]
 
-  return seqs2strands(sequences, newSilhouette, pad, newStrands, i + 1)
+  return seqs2strands(sequences, newSilhouette, newStrands, i + 1)
 }
 
 const attachIndex = (tuple, idx) => [...tuple, idx]
 
 const withoutNullValues = tuple => !isNilDomain(tuple)
 
-export const sequences2strands = (sequences, padding = 0) => {
+export const sequences2strands = sequences => {
   const domainY = getSequencesDomainY(sequences)
-  const silhouette = makeInitialSilhouette(domainY, padding)
-  return seqs2strands(sequences, silhouette, padding)
+  const silhouette = makeInitialSilhouette(domainY)
+  return seqs2strands(sequences, silhouette)
 }
 
 const getLeftValues = strand => strand.map(tuple => tuple[0])
@@ -146,14 +137,8 @@ export const makeAreaConverter = (scaleX, scaleY, curving) => strand =>
 
 export const getColorByIndex = idx => COLORS[idx % COLORS.length]
 
-export const getStrandAreas = ({
-  sequences,
-  width,
-  height,
-  curving,
-  padding,
-}) => {
-  const strands = sequences2strands(sequences, padding) // TODO: define padding in pixels
+export const getStrandAreas = ({ sequences, width, height, curving }) => {
+  const strands = sequences2strands(sequences)
 
   const rangeX = [0, width]
   const rangeY = [height, 0]

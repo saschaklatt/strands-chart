@@ -17,7 +17,6 @@ const StrandsChart = props => (
 )
 
 StrandsChart.defaultProps = {
-  padding: 0,
   curving: curveMonotoneY,
 }
 
