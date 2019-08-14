@@ -1,6 +1,6 @@
 import { area } from "d3-shape"
 import { scaleLinear } from "d3-scale"
-import { isNil } from "../utils"
+import { isNil, reverse } from "../utils"
 import { COLORS } from "../constants"
 
 const makeBaseTuple = v => (isNil(v) ? [null, null] : [0, v])
@@ -153,5 +153,5 @@ export const getStrandAreas = ({ sequences, width, height, curving }) => {
     .domain(domainY)
     .range(rangeY)
 
-  return strands.map(makeAreaConverter(scaleX, scaleY, curving))
+  return reverse(strands.map(makeAreaConverter(scaleX, scaleY, curving)))
 }

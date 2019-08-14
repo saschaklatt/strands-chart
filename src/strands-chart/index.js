@@ -10,6 +10,7 @@ const StrandsChart = props => (
         key={idx}
         className="strands-chart--strand"
         d={path}
+        strokeWidth={`${props.padding}px`}
         fill={getColorByIndex(idx)}
       />
     ))}
@@ -18,6 +19,7 @@ const StrandsChart = props => (
 
 StrandsChart.defaultProps = {
   curving: curveMonotoneY,
+  padding: 6,
 }
 
 export default StrandsChart
