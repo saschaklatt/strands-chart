@@ -29,3 +29,15 @@ export const reverse = ([head, ...tail]) =>
   tail.length === 0 ? [head] : [...reverse(tail), head]
 
 export const pixel2str = p => `${p[0]} ${p[1]}`
+
+export const getBemClassName = block => (element, modifier) => {
+  if (element && modifier) {
+    return `${block}--${element}__${modifier}`
+  }
+  if (element) {
+    return `${block}--${element}`
+  }
+  return `${block}`
+}
+
+export const isLast = (arr, idx) => idx === arr.length - 1

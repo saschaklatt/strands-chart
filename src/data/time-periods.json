@@ -1,0 +1,44 @@
+[
+  {
+    "start": "09/2003",
+    "position": "Business Informatics (Vocational training)",
+    "organisation": "Fortis Akademie",
+    "location": "Chemnitz"
+  },
+  {
+    "start": "09/2005",
+    "position": "School Leaving Examination (Fachabitur)",
+    "organisation": "Fortis Akademie",
+    "location": "Chemnitz"
+  },
+  {
+    "start": "09/2006",
+    "position": "Community Service",
+    "organisation": "Stadtverwaltung Mittweida",
+    "location": "Mittweida"
+  },
+  {
+    "start": "09/2007",
+    "position": "Bachelor Student",
+    "organisation": "HS Mittweida - University of applied sciences",
+    "location": "Mittweida"
+  },
+  {
+    "start": "08/2009",
+    "position": "Web Developer, full-stack",
+    "organisation": "Pluspol interactive GbR",
+    "location": "Leipzig"
+  },
+  {
+    "start": "09/2016",
+    "position": "Software Engineer, Frontend",
+    "organisation": "XPURE GmbH",
+    "location": "Leipzig"
+  },
+  {
+    "start": "01/2019",
+    "position": "Freelance Software Engineer, Frontend",
+    "organisation": "Sascha Klatt - Digital Arts",
+    "location": "Leipzig"
+  }
+]

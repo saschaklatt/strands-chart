@@ -1,5 +1,68 @@
 .strands-chart {
-  border: 1px dashed black;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin: 20px;
+}
+
+.strands-chart--lined {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex: 1 0 0;
+}
+
+.strands-chart--lines,
+.strands-chart--dates,
+.strands-chart--positions {
+  height: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+}
+
+.strands-chart--lines {
+  position: absolute;
+  width: 100%;
+  z-index: 0;
+}
+
+.strands-chart--lines > span {
+  width: 100%;
+  border-bottom: 1px dashed #333;
+}
+
+.strands-chart--dates {
+  flex: 0 1 0;
+}
+
+.strands-chart--dates > span {
+  display: flex;
+  align-items: flex-end;
+  transform: translateY(10px);
+  margin-right: 10px;
+}
+
+.strands-chart--positions {
+  flex: 1 1 auto;
+  align-items: flex-end;
+  z-index: 1;
+}
+
+.strands-chart--positions > div {
+  display: flex;
+  align-items: center;
+  text-align: right;
+}
+
+.strands-chart--positions > div > div > span:first-of-type {
+  font-weight: bold;
+  padding-right: 6px;
+}
+
+.strands-chart svg {
+  flex: 1 0 auto;
+  z-index: 1;
 }
 
 .strands-chart .strands-chart--strand {

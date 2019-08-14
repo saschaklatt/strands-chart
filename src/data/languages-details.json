@@ -1,0 +1,41 @@
+{
+  "as3": {
+    "name": "ActionScript 3"
+  },
+  "cpp": {
+    "name": "C++"
+  },
+  "cs": {
+    "name": "C#"
+  },
+  "css": {
+    "name": "CSS"
+  },
+  "java": {
+    "name": "Java"
+  },
+  "js": {
+    "name": "JavaScript"
+  },
+  "less": {
+    "name": "Less"
+  },
+  "mysql": {
+    "name": "MySQL"
+  },
+  "php": {
+    "name": "PHP"
+  },
+  "sass": {
+    "name": "Sass"
+  },
+  "ts": {
+    "name": "TypeScript"
+  },
+  "vba": {
+    "name": "Visual Basic for Applications"
+  },
+  "vb": {
+    "name": "Visual Basic"
+  }
+}
