@@ -1,32 +1,25 @@
 import { min } from "d3-array"
 import { scaleTime } from "d3-scale"
-import { timeParse } from "d3-time-format"
 import { isLast } from "../utils"
 import compose from "lodash/fp/compose"
 
 export const ATTR_TIME = "time"
 export const ATTR_HEIGHT = "height"
 export const ATTR_Y = "y"
-export const DATA = "data"
-export const KEY = "key"
-
-const TIME_FORMAT = "%m/%Y" // "month/year": 09/2016
-const parseTime = timeParse(TIME_FORMAT)
+export const ATTR_DATA = "data"
+export const ATTR_KEY = "key"
 
 const getTime = d => d[ATTR_TIME]
 
-const getYear = d => d.start
+const getData = d => d[ATTR_DATA]
 
-const getData = d => d.data
+const nestData = periods => periods.map(p => ({ [ATTR_DATA]: { ...p } }))
 
-const nestData = periods => periods.map(p => ({ [DATA]: { ...p } }))
-
-const addTime = periods =>
+const addTime = getDate => periods =>
   periods.map(p => ({
     ...p,
     [ATTR_TIME]: compose(
-      parseTime,
-      getYear,
+      getDate,
       getData
     )(p),
   }))
@@ -53,16 +46,22 @@ const addHeight = rangeY => periods =>
 const addKey = getKey => periods =>
   periods.map(p => ({
     ...p,
-    [KEY]: getKey(getData(p)),
+    [ATTR_KEY]: getKey(getData(p)),
   }))
 
-export const importTimePeriods = ({ periods, height, today, getKey }) => {
-  const periodsWithTime = compose(
-    addTime,
+export const importTimePeriods = ({
+  periods,
+  height,
+  today,
+  getKey,
+  getDate,
+}) => {
+  const nestedPeriods = compose(
+    addTime(getDate),
     addKey(getKey),
     nestData
   )(periods)
-  const domainY = [min(periodsWithTime, getTime), today]
+  const domainY = [min(nestedPeriods, getTime), today]
   const rangeY = [height, 0]
   const scaleY = scaleTime()
     .domain(domainY)
@@ -70,5 +69,5 @@ export const importTimePeriods = ({ periods, height, today, getKey }) => {
   return compose(
     addHeight(rangeY),
     addY(scaleY)
-  )(periodsWithTime)
+  )(nestedPeriods)
 }

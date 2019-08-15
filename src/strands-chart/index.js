@@ -1,18 +1,20 @@
+import "./StrandsChart.css"
 import React from "react"
 import PropTypes from "prop-types"
-import "./StrandsChart.css"
 import { getColorByIndex, getStrandAreas } from "../models/StrandModel"
-import { curveMonotoneY, curveLinear } from "d3-shape"
+import { curveMonotoneY } from "d3-shape"
 import { getBemClassName } from "../utils"
 import { timeFormat } from "d3-time-format"
-import { ATTR_HEIGHT, ATTR_Y, DATA } from "../models/time-periods"
+import {
+  ATTR_TIME,
+  ATTR_HEIGHT,
+  ATTR_Y,
+  ATTR_DATA,
+} from "../models/time-periods"
 
 const bem = getBemClassName("strands-chart")
 
-export const makeDateRenderer = format => ({ time }) => {
-  const formatTimeLabel = timeFormat(format)
-  return formatTimeLabel(time)
-}
+export const makeDateRenderer = format => ({ time }) => timeFormat(format)(time)
 
 export const makeSectionRenderer = () => (period, idx) => (
   <>{`Section ${idx}`}</>
@@ -81,10 +83,10 @@ const StrandsChart = props => (
 const SequencePropType = PropTypes.arrayOf(PropTypes.number)
 
 const PeriodPropType = PropTypes.shape({
-  // [ATTR_TIME]: PropTypes.object.isRequired,
+  [ATTR_TIME]: PropTypes.object.isRequired,
   [ATTR_HEIGHT]: PropTypes.number.isRequired,
   [ATTR_Y]: PropTypes.number.isRequired,
-  [DATA]: PropTypes.any.isRequired,
+  [ATTR_DATA]: PropTypes.any.isRequired,
 })
 
 StrandsChart.propTypes = {

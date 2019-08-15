@@ -1,16 +1,27 @@
-import React from "react"
 import "./App.css"
+import React from "react"
 import StrandsChart from "./strands-chart"
 import LANG_USAGE from "./data/languages-usage.json"
 import TIME_PERIODS from "./data/time-periods.json"
 import { importUsages, getData } from "./models/StrandParser"
 import { importTimePeriods } from "./models/time-periods"
+import { timeParse } from "d3-time-format"
+import compose from "lodash/fp/compose"
 
-const CustomSection = ({ data }, idx) => (
+const CustomSection = ({ data }) => (
   <>
     <span>{data.position}</span>
     <span>{`@ ${data.organisation}`}</span>
   </>
+)
+
+const parseTime = timeParse("%m/%Y") // "month/year": 09/2016
+
+const getStart = d => d.start
+
+const getDate = compose(
+  parseTime,
+  getStart
 )
 
 function App({ width, height }) {
@@ -18,10 +29,10 @@ function App({ width, height }) {
   const periods = importTimePeriods({
     periods: TIME_PERIODS,
     today: new Date(),
+    getKey: getStart,
     height,
-    getKey: d => d.start,
+    getDate,
   })
-  console.log(periods)
   return (
     <div className="App">
       <StrandsChart
