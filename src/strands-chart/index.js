@@ -17,8 +17,8 @@ const Dates = ({ periods }) => (
   </div>
 )
 
-const Positions = ({ periods }) => (
-  <div className={bem("positions")}>
+const Sections = ({ periods }) => (
+  <div className={bem("sections")}>
     {periods.map(({ flexYear, position, organisation }) => (
       <div key={position} style={{ flex: `1 1 ${flexYear}px` }}>
         <div>
@@ -46,30 +46,28 @@ const Strands = props => (
       viewBox={`0 0 ${props.width} ${props.height}`}
       preserveAspectRatio="none"
     >
-      <g>
-        {getStrandAreas(props).map((path, idx) => (
-          <path
-            key={idx}
-            className={bem("strand")}
-            d={path}
-            strokeWidth={`${props.padding}px`}
-            fill={getColorByIndex(idx)}
-          />
-        ))}
-      </g>
+      {getStrandAreas(props).map((path, idx) => (
+        <path
+          key={idx}
+          className={bem("strand")}
+          d={path}
+          strokeWidth={`${props.padding}px`}
+          fill={getColorByIndex(idx)}
+        />
+      ))}
     </svg>
   </div>
 )
 
 const StrandsChart = props => (
-  <div className={bem()} style={{ height: `${props.height}px` }}>
+  <figure className={bem()} style={{ height: `${props.height}px` }}>
     <Dates {...props} />
     <div className={bem("lined")}>
       <Lines {...props} />
       <Strands {...props} />
-      <Positions {...props} />
+      <Sections {...props} />
     </div>
-  </div>
+  </figure>
 )
 
 const SequencePropType = PropTypes.arrayOf(PropTypes.number)
@@ -84,7 +82,7 @@ StrandsChart.propTypes = {
 
 StrandsChart.defaultProps = {
   curving: curveMonotoneY,
-  padding: 6,
+  padding: 3,
 }
 
 export default StrandsChart
