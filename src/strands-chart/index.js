@@ -39,17 +39,26 @@ const Lines = ({ periods }) => (
 )
 
 const Strands = props => (
-  <g className={bem("strands")}>
-    {getStrandAreas(props).map((path, idx) => (
-      <path
-        key={idx}
-        className={bem("strand")}
-        d={path}
-        strokeWidth={`${props.padding}px`}
-        fill={getColorByIndex(idx)}
-      />
-    ))}
-  </g>
+  <div className={bem("strands")}>
+    <svg
+      width={props.width}
+      height={props.height}
+      viewBox={`0 0 ${props.width} ${props.height}`}
+      preserveAspectRatio="none"
+    >
+      <g>
+        {getStrandAreas(props).map((path, idx) => (
+          <path
+            key={idx}
+            className={bem("strand")}
+            d={path}
+            strokeWidth={`${props.padding}px`}
+            fill={getColorByIndex(idx)}
+          />
+        ))}
+      </g>
+    </svg>
+  </div>
 )
 
 const StrandsChart = props => (
@@ -57,9 +66,7 @@ const StrandsChart = props => (
     <Dates {...props} />
     <div className={bem("lined")}>
       <Lines {...props} />
-      <svg width={props.width} height={props.height}>
-        <Strands {...props} />
-      </svg>
+      <Strands {...props} />
       <Positions {...props} />
     </div>
   </div>
