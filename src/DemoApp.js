@@ -1,36 +1,43 @@
 import React from "react"
 import "./App.css"
 import StrandsChart from "./strands-chart"
-// import KebabChart from "./kebab-chart"
 import LANG_USAGE from "./data/languages-usage.json"
 import TIME_PERIODS from "./data/time-periods.json"
-import { importUsages } from "./models/StrandParser"
+import { importUsages, getData } from "./models/StrandParser"
 import { importTimePeriods } from "./models/time-periods"
 
-function App() {
-  const width = 460
-  const height = 720
+const CustomSection = ({ data }, idx) => (
+  <>
+    <span>{data.position}</span>
+    <span>{`@ ${data.organisation}`}</span>
+  </>
+)
 
-  const sequences = importUsages(LANG_USAGE).map(v => v.data)
+function App({ width, height }) {
+  const sequences = importUsages(LANG_USAGE).map(getData)
   const periods = importTimePeriods({
     periods: TIME_PERIODS,
     today: new Date(),
-    width,
     height,
+    getKey: d => d.start,
   })
-  console.log("sequences", sequences)
-
+  console.log(periods)
   return (
     <div className="App">
-      {/* <KebabChart width={460} height={720} /> */}
       <StrandsChart
         width={width}
         height={height}
         sequences={sequences}
         periods={periods}
+        renderSection={CustomSection}
       />
     </div>
   )
+}
+
+App.defaultProps = {
+  width: 460,
+  height: 720,
 }
 
 export default App

@@ -41,3 +41,8 @@ export const getBemClassName = block => (element, modifier) => {
 }
 
 export const isLast = (arr, idx) => idx === arr.length - 1
+
+export const debugCompose = (msg = "debug") => v => {
+  console.log(msg, v)
+  return v
+}

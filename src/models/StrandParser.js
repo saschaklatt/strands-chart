@@ -24,7 +24,7 @@ import { isNil } from "../utils"
 
 const getYear = d => (d && d.year ? d.year : null)
 
-const getData = d => (d && d.data ? d.data : [])
+export const getData = d => (d && d.data ? d.data : [])
 
 const makeValueSelector = d => value => getData(d)[value] || 0
 

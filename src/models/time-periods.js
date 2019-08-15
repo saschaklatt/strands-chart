@@ -1,72 +1,74 @@
 import { min } from "d3-array"
 import { scaleTime } from "d3-scale"
-import { timeFormat, timeParse } from "d3-time-format"
+import { timeParse } from "d3-time-format"
 import { isLast } from "../utils"
+import compose from "lodash/fp/compose"
 
-/**
- * [
- *   {
- *     yLine: 255,
- *     yLabel: 180,
- *     start: 2005,
- *     label: "School Leaving Examination (Fachabitur)",
- *     organization: "Fortis Akademie",
- *     location: "Chemnitz"
- *   },
- *   ...
- * ]
- */
+export const ATTR_TIME = "time"
+export const ATTR_HEIGHT = "height"
+export const ATTR_Y = "y"
+export const DATA = "data"
+export const KEY = "key"
 
 const TIME_FORMAT = "%m/%Y" // "month/year": 09/2016
-
 const parseTime = timeParse(TIME_FORMAT)
 
-const formatTimeLabel = timeFormat("%Y")
-
-const getTime = d => d.startTime
+const getTime = d => d[ATTR_TIME]
 
 const getYear = d => d.start
+
+const getData = d => d.data
+
+const nestData = periods => periods.map(p => ({ [DATA]: { ...p } }))
 
 const addTime = periods =>
   periods.map(p => ({
     ...p,
-    startTime: parseTime(getYear(p)),
+    [ATTR_TIME]: compose(
+      parseTime,
+      getYear,
+      getData
+    )(p),
   }))
 
-export const importTimePeriods = ({ periods, width, height, today }) => {
-  const periodsWithTime = addTime(periods)
+const addY = scaleY => periods =>
+  periods.map(period => ({
+    ...period,
+    [ATTR_Y]: compose(
+      Math.round,
+      scaleY,
+      getTime
+    )(period),
+  }))
+
+const addHeight = rangeY => periods =>
+  periods.map((period, idx, arr) => {
+    const nextY = isLast(arr, idx) ? rangeY[1] : arr[idx + 1].y
+    return {
+      ...period,
+      [ATTR_HEIGHT]: Math.round(period.y - nextY),
+    }
+  })
+
+const addKey = getKey => periods =>
+  periods.map(p => ({
+    ...p,
+    [KEY]: getKey(getData(p)),
+  }))
+
+export const importTimePeriods = ({ periods, height, today, getKey }) => {
+  const periodsWithTime = compose(
+    addTime,
+    addKey(getKey),
+    nestData
+  )(periods)
   const domainY = [min(periodsWithTime, getTime), today]
   const rangeY = [height, 0]
   const scaleY = scaleTime()
     .domain(domainY)
     .range(rangeY)
-
-  const halfTextHeight = 8
-
-  return periodsWithTime
-    .map(period => {
-      const time = getTime(period)
-      const yLine = Math.round(scaleY(time))
-      const yYear = yLine - halfTextHeight
-      return {
-        ...period,
-        yLine,
-        yYear,
-        year: formatTimeLabel(time),
-      }
-    })
-    .map((period, idx, arr) => {
-      const nextY = isLast(arr, idx) ? rangeY[1] : arr[idx + 1].yLine
-      return {
-        ...period,
-        yPosition: period.yLine + halfTextHeight + (nextY - period.yLine) / 2,
-      }
-    })
-    .map((period, idx, arr) => {
-      const nextY = isLast(arr, idx) ? rangeY[1] : arr[idx + 1].yLine
-      return {
-        ...period,
-        flexYear: Math.round(period.yLine - nextY),
-      }
-    })
+  return compose(
+    addHeight(rangeY),
+    addY(scaleY)
+  )(periodsWithTime)
 }
