@@ -1,114 +1,93 @@
+/**
+ * @fileoverview Converts sequences into svg area paths.
+ */
+
 import { area } from "d3-shape"
 import { scaleLinear } from "d3-scale"
-import { isNil, reverse } from "../utils"
+import { isNil, reverse, isNilDomain, getDomainSize, add } from "../utils"
 import { COLORS } from "../constants"
 import compose from "lodash/fp/compose"
 
-const makeBaseTuple = v => (isNil(v) ? [null, null] : [0, v])
+const getDomainY = list => [
+  0,
+  list.reduce((max, arr) => Math.max(max, arr.length - 1), 0),
+]
 
-const makeTuple = (v1, v2) => [v1, v2]
+const makeInitialPair = v => (isNil(v) ? [null, null] : [0, v])
 
-export const strandFromSequence = sequence =>
-  Array.from(sequence, makeBaseTuple)
+const strandFromSequence = sequence => Array.from(sequence, makeInitialPair)
 
-const makeTupleValueMover = dx => v => (isNil(v) ? null : v + dx)
+const moveValue = dx => v => (isNil(v) ? null : v + dx)
 
-const makeTupleValueSetter = x => v => (isNil(v) ? null : x)
+const setValue = x => v => (isNil(v) ? null : x)
 
-const makeStrandExtender = direction => strand => sequence => {
-  return strand.map((t, i) => {
+const extendStrand = direction => strand => sequence =>
+  strand.map((t, i) => {
     const dx = sequence[i] * direction
-    const move = makeTupleValueMover(dx)
+    const move = moveValue(dx)
     return direction < 0 ? [move(t[0]), t[1]] : [t[0], move(t[1])]
   })
-}
 
-export const isNilDomain = ([p1, p2]) => isNil(p1) || isNil(p2)
-
-export const getDomainSize = d =>
-  isNilDomain(d) ? null : Math.abs(d[1] - d[0])
-
-export const makeStrandSnuggler = dir => targetStrand => baseStrand =>
-  baseStrand.map((t, i) => {
-    if (isNilDomain(t) || isNilDomain(targetStrand[i])) {
-      return t
+const snuggle = dir => targetStrand => baseStrand =>
+  baseStrand.map((pair, i) => {
+    if (isNilDomain(pair) || isNilDomain(targetStrand[i])) {
+      return pair
     }
-    const sideIdx = dir < 0 ? 0 : 1
-    const x = targetStrand[i][sideIdx]
-    const w = getDomainSize(t)
-    const left = dir < 0 ? x - w : x
-    const right = dir < 0 ? x : x + w
-    const setLeft = makeTupleValueSetter(left)
-    const setRight = makeTupleValueSetter(right)
-    return [setLeft(t[0]), setRight(t[1])]
+    const side = dir < 0 ? 0 : 1
+    const x = targetStrand[i][side]
+    const w = getDomainSize(pair)
+    const setLeft = setValue(dir < 0 ? x - w : x)
+    const setRight = setValue(dir < 0 ? x : x + w)
+    return [setLeft(pair[0]), setRight(pair[1])]
   })
 
-export const getSingleSequenceWidth = sequence => Math.max(...sequence)
-
-export const getMultiSequenceWidth = sequences => {
-  const seqWidth = sequences.reduce(
-    (acc, seq) => acc + getSingleSequenceWidth(seq),
-    0
-  )
-  return seqWidth
-}
-
-const extendSequenceValue = dx => v => {
-  if (isNil(dx)) {
-    return v
-  }
-  if (isNil(v)) {
-    return null
-  }
-  const move = makeTupleValueMover(dx)
-  return move(v)
-}
-
-export const makeSequenceExtender = dx => sequence =>
-  sequence.map(extendSequenceValue(dx))
-
 const makeVerticalStrand = (x, height) =>
-  Array.from({ length: height }, () => makeTuple(x, x))
+  Array.from({ length: height }, () => [x, x])
 
-export const makeInitialSilhouette = domainY =>
-  makeVerticalStrand(0, getDomainSize(domainY))
+const makeInitialSilhouette = height => makeVerticalStrand(0, height)
 
-const seqs2strands = (sequences, silhouette, strands = [], i = 0) => {
+const makeSilhouette = compose(
+  makeInitialSilhouette,
+  add(1), // why add one?
+  getDomainSize,
+  getDomainY
+)
+
+const seqs2strands = (
+  sequences,
+  silhouette = makeSilhouette(sequences),
+  strands = [],
+  i = 0
+) => {
   if (i >= sequences.length) {
     return strands
   }
 
   const seq = sequences[i]
   const dir = i % 2 ? 1 : -1
-  const makeDirectedSnuggler = makeStrandSnuggler(dir)
-  const snuggleWithSilhouette = makeDirectedSnuggler(silhouette)
+  const snuggleWithSilhouette = snuggle(dir)(silhouette)
+  const newSilhouette = extendStrand(dir)(silhouette)(seq)
 
-  const extendSilhouette = makeStrandExtender(dir)(silhouette)
-  const newSilhouette = extendSilhouette(seq)
-
-  const strand = snuggleWithSilhouette(strandFromSequence(seq))
-    .map(attachIndex)
-    .filter(withoutNullValues)
-  const newStrands = [...strands, strand]
+  const makeStrand = compose(
+    removeNullValues,
+    attachIndex,
+    snuggleWithSilhouette,
+    strandFromSequence
+  )
+  const newStrands = [...strands, makeStrand(seq)]
 
   return seqs2strands(sequences, newSilhouette, newStrands, i + 1)
 }
 
-const attachIndex = (tuple, idx) => [...tuple, idx]
+const attachIndex = strands => strands.map((pair, idx) => [...pair, idx])
 
-const withoutNullValues = tuple => !isNilDomain(tuple)
+const removeNullValues = strands => strands.filter(pair => !isNilDomain(pair))
 
-export const sequences2strands = sequences => {
-  const domainY = getSequencesDomainY(sequences)
-  const silhouette = makeInitialSilhouette(domainY)
-  return seqs2strands(sequences, silhouette)
-}
+const getLeftValues = strand => strand.map(pair => pair[0])
 
-const getLeftValues = strand => strand.map(tuple => tuple[0])
+const getRightValues = strand => strand.map(pair => pair[1])
 
-const getRightValues = strand => strand.map(tuple => tuple[1])
-
-export const getStrandsDomainX = strands =>
+const getStrandsDomainX = strands =>
   strands.reduce(
     (domain, strand) => {
       const min = Math.min(...getLeftValues(strand))
@@ -118,18 +97,7 @@ export const getStrandsDomainX = strands =>
     [Infinity, -Infinity]
   )
 
-// TODO: use just one method: getSequencesDomainY() or getStrandsDomainY()
-const getSequencesDomainY = sequences => [
-  sequences.reduce((max, seq) => Math.max(max, seq.length), 0),
-  0,
-]
-
-export const getStrandsDomainY = strands => [
-  0,
-  strands.reduce((max, strand) => Math.max(max, strand.length - 1), 0),
-]
-
-export const toArea = ({ scaleX, scaleY, curving }) => strands =>
+const toArea = ({ scaleX, scaleY, curving }) => strands =>
   strands.map(strand =>
     area()
       .curve(curving)
@@ -138,17 +106,15 @@ export const toArea = ({ scaleX, scaleY, curving }) => strands =>
       .y(d => scaleY(d[2]))(strand)
   )
 
-export const getColorByIndex = idx => COLORS[idx % COLORS.length]
-
 export const areas = ({ width, height, curving }) => sequences => {
-  const strands = sequences2strands(sequences)
+  const strands = seqs2strands(sequences)
 
   const scaleX = scaleLinear()
     .domain(getStrandsDomainX(strands))
     .range([0, width])
 
   const scaleY = scaleLinear()
-    .domain(getStrandsDomainY(strands))
+    .domain(getDomainY(strands))
     .range([height, 0])
 
   return compose(
@@ -156,3 +122,5 @@ export const areas = ({ width, height, curving }) => sequences => {
     toArea({ scaleX, scaleY, curving })
   )(strands)
 }
+
+export const getColorByIndex = idx => COLORS[idx % COLORS.length]

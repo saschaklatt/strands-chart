@@ -1,12 +1,29 @@
 import { isNil } from "../utils"
+import compose from "lodash/fp/compose"
 
 /**
- * Algorithm:
- * [√] sort raw data by year
- * [√] make a sequence array for each language
- * [√] replace null-values in the middle with 0-values
- * [√] sort strands by surface area
+ * Converts the base format grouped by years into strands grouped by data items.
  *
+ * Algorithm:
+ * - sort raw data by year
+ * - make a sequence array for each language
+ * - replace null-values in the middle with 0-values
+ * - sort strands by surface area
+ *
+ * Base format:
+ * [
+ *   {
+ *     "year": 2005,
+ *     "data": {
+ *       "js": 1,
+ *       "php": 2,
+ *       "cpp": 1,
+ *       "vba": 2,
+ *       "mysql": 2
+ *     }
+ *   },
+ *   ...
+ * ]
  *
  * Target format:
  * [
@@ -33,17 +50,14 @@ const asc = selector => (a, b) => selector(a) - selector(b)
 const uniqueList = (list, key) =>
   list.includes(key) ? [...list] : [...list, key]
 
-const makeKeyFilter = selector => arr =>
+const filterKeys = selector => arr =>
   arr.reduce(
     (list, entry) => Object.keys(selector(entry)).reduce(uniqueList, list),
     []
   )
 
-const filterKeys = makeKeyFilter(getData)
-
-const reduceKeysToObject = (acc, key) => ({ ...acc, [key]: [] })
-
-const keysToObject = keys => keys.reduce(reduceKeysToObject, {})
+const keysToObject = keys =>
+  keys.reduce((acc, key) => ({ ...acc, [key]: [] }), {})
 
 const toArray = obj =>
   Object.entries(obj).map(([key, data]) => ({
@@ -66,9 +80,19 @@ const getSurfaceArea = strand => strand.reduce(sum, 0)
 const descSurfaceArea = selector => (a, b) =>
   getSurfaceArea(selector(b)) - getSurfaceArea(selector(a))
 
+const sortByYear = input => [...input].sort(asc(getYear))
+
+const toKeyListObject = keys => arr =>
+  arr.reduce(putValuesIntoList(keys), keysToObject(keys))
+
+const sortBySurfaceArea = arr => arr.sort(descSurfaceArea(getData))
+
 export const importUsages = input => {
-  const sorted = [...input].sort(asc(getYear))
-  const keys = filterKeys(sorted)
-  const keyListObj = sorted.reduce(putValuesIntoList(keys), keysToObject(keys))
-  return toArray(keyListObj).sort(descSurfaceArea(getData))
+  const sorted = sortByYear(input)
+  const keys = filterKeys(getData)(sorted)
+  return compose(
+    sortBySurfaceArea,
+    toArray,
+    toKeyListObject(keys)
+  )(sorted)
 }

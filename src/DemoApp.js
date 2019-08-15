@@ -24,6 +24,8 @@ const getDate = compose(
   getStart
 )
 
+const StrandButtons = ({ sequences }) => {}
+
 function App({ width, height }) {
   const sequences = importUsages(LANG_USAGE).map(getData)
   const periods = importTimePeriods({
