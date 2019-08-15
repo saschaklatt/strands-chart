@@ -2,6 +2,7 @@ import { area } from "d3-shape"
 import { scaleLinear } from "d3-scale"
 import { isNil, reverse } from "../utils"
 import { COLORS } from "../constants"
+import compose from "lodash/fp/compose"
 
 const makeBaseTuple = v => (isNil(v) ? [null, null] : [0, v])
 
@@ -128,30 +129,30 @@ export const getStrandsDomainY = strands => [
   strands.reduce((max, strand) => Math.max(max, strand.length - 1), 0),
 ]
 
-export const makeAreaConverter = (scaleX, scaleY, curving) => strand =>
-  area()
-    .curve(curving)
-    .x0(d => scaleX(d[0]))
-    .x1(d => scaleX(d[1]))
-    .y(d => scaleY(d[2]))(strand)
+export const toArea = ({ scaleX, scaleY, curving }) => strands =>
+  strands.map(strand =>
+    area()
+      .curve(curving)
+      .x0(d => scaleX(d[0]))
+      .x1(d => scaleX(d[1]))
+      .y(d => scaleY(d[2]))(strand)
+  )
 
 export const getColorByIndex = idx => COLORS[idx % COLORS.length]
 
-export const getStrandAreas = ({ sequences, width, height, curving }) => {
+export const areas = ({ width, height, curving }) => sequences => {
   const strands = sequences2strands(sequences)
 
-  const rangeX = [0, width]
-  const rangeY = [height, 0]
-  const domainX = getStrandsDomainX(strands)
-  const domainY = getStrandsDomainY(strands)
-
   const scaleX = scaleLinear()
-    .domain(domainX)
-    .range(rangeX)
+    .domain(getStrandsDomainX(strands))
+    .range([0, width])
 
   const scaleY = scaleLinear()
-    .domain(domainY)
-    .range(rangeY)
+    .domain(getStrandsDomainY(strands))
+    .range([height, 0])
 
-  return reverse(strands.map(makeAreaConverter(scaleX, scaleY, curving)))
+  return compose(
+    reverse,
+    toArea({ scaleX, scaleY, curving })
+  )(strands)
 }

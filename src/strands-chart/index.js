@@ -1,7 +1,7 @@
 import "./StrandsChart.css"
 import React from "react"
 import PropTypes from "prop-types"
-import { getColorByIndex, getStrandAreas } from "../models/StrandModel"
+import { getColorByIndex, areas } from "../models/StrandModel"
 import { curveMonotoneY } from "d3-shape"
 import { getBemClassName } from "../utils"
 import { timeFormat } from "d3-time-format"
@@ -33,7 +33,7 @@ const Dates = ({ periods, renderDate }) => (
 const Sections = ({ periods, renderSection }) => (
   <div className={bem("sections")}>
     {periods.map((period, idx) => (
-      <div key={period.data.start} style={{ flex: `1 1 ${period.height}px` }}>
+      <div key={period.key} style={{ flex: `1 1 ${period.height}px` }}>
         <div>{renderSection(period, idx)}</div>
       </div>
     ))}
@@ -42,26 +42,26 @@ const Sections = ({ periods, renderSection }) => (
 
 const Lines = ({ periods }) => (
   <div className={bem("lines")}>
-    {periods.map(({ height, data }) => (
-      <span key={data.position} style={{ height: `${height}px` }} />
+    {periods.map(({ height, key }) => (
+      <span key={key} style={{ height: `${height}px` }} />
     ))}
   </div>
 )
 
-const Strands = props => (
+const Strands = ({ width, height, curving, padding, sequences }) => (
   <div className={bem("strands")}>
     <svg
-      width={props.width}
-      height={props.height}
-      viewBox={`0 0 ${props.width} ${props.height}`}
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
     >
-      {getStrandAreas(props).map((path, idx) => (
+      {areas({ width, height, curving })(sequences).map((path, idx) => (
         <path
           key={idx}
           className={bem("strand")}
           d={path}
-          strokeWidth={`${props.padding}px`}
+          strokeWidth={`${padding}px`}
           fill={getColorByIndex(idx)}
         />
       ))}
