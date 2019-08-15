@@ -20,7 +20,7 @@ const Dates = ({ periods }) => (
 const Positions = ({ periods }) => (
   <div className={bem("positions")}>
     {periods.map(({ flexYear, position, organisation }) => (
-      <div key={position} style={{ height: `${flexYear}px` }}>
+      <div key={position} style={{ flex: `1 1 ${flexYear}px` }}>
         <div>
           <span>{position}</span>
           <span>{`@ ${organisation}`}</span>
