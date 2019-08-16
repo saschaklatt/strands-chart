@@ -1,7 +1,7 @@
 import "./StrandsChart.css"
 import React from "react"
 import PropTypes from "prop-types"
-import { getColorByIndex, areas } from "../models/StrandModel"
+import { getColorByIndex, areas } from "../models/strand-areas"
 import { curveMonotoneY } from "d3-shape"
 import { getBemClassName } from "../utils"
 import { timeFormat } from "d3-time-format"
