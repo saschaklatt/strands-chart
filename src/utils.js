@@ -27,6 +27,10 @@ export const isNilDomain = d => isNil(d) || isNil(d[0]) || isNil(d[1])
 export const getDomainSize = d =>
   isNilDomain(d) ? null : Math.abs(d[1] - d[0])
 
+/**
+ * Copied from:
+ * https://stackoverflow.com/questions/48293642/js-curry-function-with-recursion
+ */
 export function curry(func, arity = func.length) {
   return function(...args) {
     if (args.length >= arity) {
@@ -38,3 +42,10 @@ export function curry(func, arity = func.length) {
 }
 
 export const add = a => b => a + b
+
+export const nest = key => d => ({ [key]: d })
+
+export const inject = target => key => data => ({
+  ...target,
+  [key]: data,
+})

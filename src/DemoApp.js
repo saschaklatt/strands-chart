@@ -27,7 +27,9 @@ const getDate = compose(
 const StrandButtons = ({ sequences }) => {}
 
 function App({ width, height }) {
-  const sequences = importUsages(LANG_USAGE).map(getData)
+  const sequences = importUsages(LANG_USAGE) //.map(getData)
+  console.log("sequences", sequences)
+
   const periods = importTimePeriods({
     periods: TIME_PERIODS,
     today: new Date(),

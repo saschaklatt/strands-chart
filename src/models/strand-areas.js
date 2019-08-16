@@ -4,9 +4,29 @@
 
 import { area } from "d3-shape"
 import { scaleLinear } from "d3-scale"
-import { isNil, reverse, isNilDomain, getDomainSize, add } from "../utils"
+import {
+  isNil,
+  reverse,
+  isNilDomain,
+  getDomainSize,
+  add,
+  inject,
+  curry,
+} from "../utils"
 import { COLORS } from "../constants"
 import compose from "lodash/fp/compose"
+
+const extract = key => list => list.map(data => data && data[key])
+
+const getDomainX = list =>
+  list.reduce(
+    (domain, data) => {
+      const min = Math.min(...getLeftValues(data))
+      const max = Math.max(...getRightValues(data))
+      return [Math.min(domain[0], min), Math.max(domain[1], max)]
+    },
+    [Infinity, -Infinity]
+  )
 
 const getDomainY = list => [
   0,
@@ -15,18 +35,19 @@ const getDomainY = list => [
 
 const makeInitialPair = v => (isNil(v) ? [null, null] : [0, v])
 
-const strandFromSequence = sequence => Array.from(sequence, makeInitialPair)
+const strandFromSequence = seq => Array.from(seq, makeInitialPair)
 
 const moveValue = dx => v => (isNil(v) ? null : v + dx)
 
 const setValue = x => v => (isNil(v) ? null : x)
 
-const extendStrand = direction => strand => sequence =>
-  strand.map((t, i) => {
-    const dx = sequence[i] * direction
+const extendSilhouette = dir => sil => seq => {
+  return sil.map((t, i) => {
+    const dx = seq[i] * dir
     const move = moveValue(dx)
-    return direction < 0 ? [move(t[0]), t[1]] : [t[0], move(t[1])]
+    return dir < 0 ? [move(t[0]), t[1]] : [t[0], move(t[1])]
   })
+}
 
 const snuggle = dir => targetStrand => baseStrand =>
   baseStrand.map((pair, i) => {
@@ -46,16 +67,19 @@ const makeVerticalStrand = (x, height) =>
 
 const makeInitialSilhouette = height => makeVerticalStrand(0, height)
 
-const makeSilhouette = compose(
-  makeInitialSilhouette,
-  add(1), // why add one?
-  getDomainSize,
-  getDomainY
-)
+const makeSilhouette = dataKey =>
+  compose(
+    makeInitialSilhouette,
+    add(1), // why add one?
+    getDomainSize,
+    getDomainY,
+    extract(dataKey)
+  )
 
 const seqs2strands = (
   sequences,
-  silhouette = makeSilhouette(sequences),
+  dataKey,
+  silhouette = makeSilhouette(dataKey)(sequences),
   strands = [],
   i = 0
 ) => {
@@ -64,9 +88,10 @@ const seqs2strands = (
   }
 
   const seq = sequences[i]
+  const seqData = seq[dataKey]
   const dir = i % 2 ? 1 : -1
   const snuggleWithSilhouette = snuggle(dir)(silhouette)
-  const newSilhouette = extendStrand(dir)(silhouette)(seq)
+  const newSilhouette = extendSilhouette(dir)(silhouette)(seqData)
 
   const makeStrand = compose(
     removeNullValues,
@@ -74,53 +99,47 @@ const seqs2strands = (
     snuggleWithSilhouette,
     strandFromSequence
   )
-  const newStrands = [...strands, makeStrand(seq)]
+  const newStrands = [...strands, inject(seq)(dataKey)(makeStrand(seqData))]
 
-  return seqs2strands(sequences, newSilhouette, newStrands, i + 1)
+  return seqs2strands(sequences, dataKey, newSilhouette, newStrands, i + 1)
 }
 
-const attachIndex = strands => strands.map((pair, idx) => [...pair, idx])
+const attachIndex = strand => strand.map((pair, idx) => [...pair, idx])
 
-const removeNullValues = strands => strands.filter(pair => !isNilDomain(pair))
+const removeNullValues = strand => strand.filter(pair => !isNilDomain(pair))
 
-const getLeftValues = strand => strand.map(pair => pair[0])
+const getLeftValues = data => data.map(pair => pair[0])
 
-const getRightValues = strand => strand.map(pair => pair[1])
+const getRightValues = data => data.map(pair => pair[1])
 
-const getStrandsDomainX = strands =>
-  strands.reduce(
-    (domain, strand) => {
-      const min = Math.min(...getLeftValues(strand))
-      const max = Math.max(...getRightValues(strand))
-      return [Math.min(domain[0], min), Math.max(domain[1], max)]
-    },
-    [Infinity, -Infinity]
-  )
-
-const toArea = ({ scaleX, scaleY, curving }) => strands =>
+const toArea = curry((scaleX, scaleY, curving, dataKey, strands) =>
   strands.map(strand =>
-    area()
-      .curve(curving)
-      .x0(d => scaleX(d[0]))
-      .x1(d => scaleX(d[1]))
-      .y(d => scaleY(d[2]))(strand)
+    inject(strand)(dataKey)(
+      area()
+        .curve(curving)
+        .x0(d => scaleX(d[0]))
+        .x1(d => scaleX(d[1]))
+        .y(d => scaleY(d[2]))(strand[dataKey])
+    )
   )
+)
 
-export const areas = ({ width, height, curving }) => sequences => {
-  const strands = seqs2strands(sequences)
+export const areas = curry((width, height, curving, dataKey, sequences) => {
+  const strands = seqs2strands(sequences, dataKey)
+  const strandsData = strands.map(s => s[dataKey])
 
   const scaleX = scaleLinear()
-    .domain(getStrandsDomainX(strands))
+    .domain(getDomainX(strandsData))
     .range([0, width])
 
   const scaleY = scaleLinear()
-    .domain(getDomainY(strands))
+    .domain(getDomainY(strandsData))
     .range([height, 0])
 
   return compose(
     reverse,
-    toArea({ scaleX, scaleY, curving })
+    toArea(scaleX, scaleY, curving, dataKey)
   )(strands)
-}
+})
 
 export const getColorByIndex = idx => COLORS[idx % COLORS.length]

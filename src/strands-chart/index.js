@@ -56,11 +56,11 @@ const Strands = ({ width, height, curving, padding, sequences }) => (
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
     >
-      {areas({ width, height, curving })(sequences).map((path, idx) => (
+      {areas(width, height, curving, ATTR_DATA, sequences).map((area, idx) => (
         <path
           key={idx}
           className={bem("strand")}
-          d={path}
+          d={area[ATTR_DATA]}
           strokeWidth={`${padding}px`}
           fill={getColorByIndex(idx)}
         />
