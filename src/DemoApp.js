@@ -3,10 +3,11 @@ import React from "react"
 import StrandsChart from "./strands-chart"
 import LANG_USAGE from "./data/languages-usage.json"
 import TIME_PERIODS from "./data/time-periods.json"
-import { importUsages, getData } from "./models/StrandParser"
-import { importTimePeriods, ATTR_KEY } from "./models/time-periods"
+import { importUsages } from "./models/StrandParser"
+import { importTimePeriods } from "./models/time-periods"
 import { timeParse } from "d3-time-format"
 import compose from "lodash/fp/compose"
+import { COLORS, ATTR_KEY, ATTR_COLOR } from "./constants"
 
 const CustomSection = ({ data }) => (
   <>
@@ -44,7 +45,6 @@ class App extends React.Component {
   constructor(props) {
     super(props)
 
-    const sequences = importUsages(LANG_USAGE)
     const periods = importTimePeriods({
       periods: TIME_PERIODS,
       today: new Date(),
@@ -52,6 +52,7 @@ class App extends React.Component {
       height: props.height,
       getDate,
     })
+    const sequences = importUsages(LANG_USAGE, COLORS)
 
     this.state = {
       sequences,
@@ -60,8 +61,7 @@ class App extends React.Component {
     }
   }
 
-  handleSelectionChange = (key, idx) => {
-    console.log("change", key, idx)
+  handleSelectionChange = key => {
     this.setState(({ selection }) => {
       const i = selection.indexOf(key)
       if (i >= 0) {
@@ -76,7 +76,8 @@ class App extends React.Component {
   render() {
     const { width, height } = this.props
     const { selection, sequences, periods } = this.state
-    console.log("selection", selection)
+    const visibleSequences = sequences.filter(s => selection.includes(s.key))
+    // console.log("sequences", visibleSequences)
     return (
       <div className="App">
         <Selection
@@ -87,9 +88,10 @@ class App extends React.Component {
         <StrandsChart
           width={width}
           height={height}
-          sequences={sequences.filter(s => selection.includes(s.key))}
+          sequences={visibleSequences}
           periods={periods}
           renderSection={CustomSection}
+          getColor={d => d[ATTR_COLOR]}
         />
       </div>
     )

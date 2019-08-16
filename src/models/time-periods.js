@@ -1,13 +1,14 @@
 import { min } from "d3-array"
 import { scaleTime } from "d3-scale"
-import { isLast } from "../utils"
+import { isLast, trace } from "../utils"
 import compose from "lodash/fp/compose"
-
-export const ATTR_TIME = "time"
-export const ATTR_HEIGHT = "height"
-export const ATTR_Y = "y"
-export const ATTR_DATA = "data"
-export const ATTR_KEY = "key"
+import {
+  ATTR_TIME,
+  ATTR_DATA,
+  ATTR_KEY,
+  ATTR_HEIGHT,
+  ATTR_Y,
+} from "../constants"
 
 const getTime = d => d[ATTR_TIME]
 

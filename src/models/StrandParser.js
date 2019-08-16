@@ -1,5 +1,6 @@
 import { isNil } from "../utils"
 import compose from "lodash/fp/compose"
+import { ATTR_COLOR } from "../constants"
 
 /**
  * Converts the base format grouped by years into strands grouped by data items.
@@ -87,10 +88,17 @@ const toKeyListObject = keys => arr =>
 
 const sortBySurfaceArea = arr => arr.sort(descSurfaceArea(getData))
 
-export const importUsages = input => {
+const addColors = colors => arr =>
+  arr.map((v, idx) => ({
+    ...v,
+    [ATTR_COLOR]: colors[idx % colors.length],
+  }))
+
+export const importUsages = (input, colors) => {
   const sorted = sortByYear(input)
   const keys = filterKeys(getData)(sorted)
   return compose(
+    addColors(colors),
     sortBySurfaceArea,
     toArray,
     toKeyListObject(keys)

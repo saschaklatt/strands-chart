@@ -124,6 +124,7 @@ const toArea = curry((scaleX, scaleY, curving, dataKey, strands) =>
 )
 
 export const areas = curry((width, height, curving, dataKey, sequences) => {
+  console.log("")
   const strands = seqs2strands(sequences, dataKey)
   const strandsData = strands.map(s => s[dataKey])
 
@@ -140,5 +141,3 @@ export const areas = curry((width, height, curving, dataKey, sequences) => {
     toArea(scaleX, scaleY, curving, dataKey)
   )(strands)
 })
-
-export const getColorByIndex = idx => COLORS[idx % COLORS.length]

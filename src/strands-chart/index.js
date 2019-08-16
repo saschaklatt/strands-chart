@@ -11,7 +11,7 @@ import {
   ATTR_Y,
   ATTR_DATA,
   ATTR_KEY,
-} from "../models/time-periods"
+} from "../constants"
 
 const bem = getBemClassName("strands-chart")
 
@@ -49,7 +49,7 @@ const Lines = ({ periods }) => (
   </div>
 )
 
-const Strands = ({ width, height, curving, padding, sequences }) => (
+const Strands = ({ width, height, curving, padding, sequences, getColor }) => (
   <div className={bem("strands")}>
     <svg
       width={width}
@@ -63,7 +63,7 @@ const Strands = ({ width, height, curving, padding, sequences }) => (
           className={bem("strand")}
           d={area[ATTR_DATA]}
           strokeWidth={`${padding}px`}
-          fill={getColorByIndex(idx)}
+          fill={getColor(area)}
         />
       ))}
     </svg>
@@ -102,6 +102,7 @@ StrandsChart.propTypes = {
   periods: PropTypes.arrayOf(PeriodPropType).isRequired,
   renderDate: PropTypes.func.isRequired,
   renderSection: PropTypes.func.isRequired,
+  getColor: PropTypes.func.isRequired,
 }
 
 StrandsChart.defaultProps = {

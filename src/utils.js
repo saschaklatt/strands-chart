@@ -2,8 +2,13 @@ export const isNil = v => v === null || v === undefined
 
 export const isNotNil = v => v !== null && v !== undefined
 
-export const reverse = ([head, ...tail]) =>
-  tail.length === 0 ? [head] : [...reverse(tail), head]
+export const reverse = arr => {
+  if (arr.length === 0) {
+    return []
+  }
+  const [head, ...tail] = arr
+  return tail.length === 0 ? [head] : [...reverse(tail), head]
+}
 
 export const getBemClassName = block => (element, modifier) => {
   if (element && modifier) {
