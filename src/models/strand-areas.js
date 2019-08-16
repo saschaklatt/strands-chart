@@ -3,22 +3,20 @@
  */
 
 import { area } from "d3-shape"
-import { scaleLinear } from "d3-scale"
 import {
   isNil,
-  reverse,
   isNilDomain,
   getDomainSize,
   inject,
   curry,
   increase,
+  getCenter,
 } from "../utils"
-import { COLORS } from "../constants"
 import compose from "lodash/fp/compose"
 
 const extract = key => list => list.map(data => data && data[key])
 
-const getDomainX = list =>
+export const getDomainX = list =>
   list.reduce(
     (domain, data) => {
       const min = Math.min(...getLeftValues(data))
@@ -28,7 +26,7 @@ const getDomainX = list =>
     [Infinity, -Infinity]
   )
 
-const getDomainY = list => [
+export const getDomainY = list => [
   0,
   list.reduce((max, arr) => Math.max(max, arr.length - 1), 0),
 ]
@@ -75,7 +73,7 @@ const makeSilhouette = dataKey =>
     extract(dataKey)
   )
 
-const seqs2strands = (
+export const seqs2strands = (
   sequences,
   dataKey,
   silhouette = makeSilhouette(dataKey)(sequences),
@@ -88,9 +86,8 @@ const seqs2strands = (
 
   const seq = sequences[i]
   const seqData = seq[dataKey]
-  const dir = i % 2 ? 1 : -1
-  const snuggleWithSilhouette = snuggle(dir)(silhouette)
-  const newSilhouette = extendSilhouette(dir)(silhouette)(seqData)
+  const snuggleWithSilhouette = snuggle(seq.dir)(silhouette)
+  const newSilhouette = extendSilhouette(seq.dir)(silhouette)(seqData)
 
   const makeStrand = compose(
     removeNullValues,
@@ -111,33 +108,42 @@ const getLeftValues = data => data.map(pair => pair[0])
 
 const getRightValues = data => data.map(pair => pair[1])
 
-const toArea = curry((scaleX, scaleY, curving, dataKey, strands) =>
-  strands.map(strand =>
-    inject(strand, dataKey)(
-      area()
-        .curve(curving)
-        .x0(d => scaleX(d[0]))
-        .x1(d => scaleX(d[1]))
-        .y(d => scaleY(d[2]))(strand[dataKey])
-    )
-  )
+// export const makeBornArea = curry(
+//   (curving, scaleX, scaleY, getData, strands, strand, idx) => {
+//     const prev = idx > 0 ? strands[idx - 1] : strand.data.map(d => [0, 0])
+//     // console.log("idx", idx, prev)
+//     return area()
+//       .curve(curving)
+//       .x0((d, i) => {
+//         console.log(prev[i])
+//         return scaleX(prev[i][strand.dir > 0 ? 0 : 1])
+//       })
+//       .x1((d, i) => scaleX(prev[i][strand.dir > 0 ? 0 : 1]))
+//       .y(d => scaleY(d[2]))(getData(strand))
+//   }
+// )
+
+export const makeBornArea = curry((curving, scaleX, scaleY, getData, strand) =>
+  area()
+    .curve(curving)
+    .x0(d => scaleX(getCenter(d)))
+    .x1(d => scaleX(getCenter(d)))
+    .y(d => scaleY(d[2]))(getData(strand))
 )
 
-export const areas = curry((width, height, curving, dataKey, sequences) => {
-  console.log("")
-  const strands = seqs2strands(sequences, dataKey)
-  const strandsData = strands.map(s => s[dataKey])
+export const makeDiedArea = curry((curving, scaleX, scaleY, getData, strand) =>
+  area()
+    .curve(curving)
+    .x0(d => scaleX(d[strand.dir > 0 ? 0 : 1]))
+    .x1(d => scaleX(d[strand.dir > 0 ? 0 : 1]))
+    .y(d => scaleY(d[2]))(getData(strand))
+)
 
-  const scaleX = scaleLinear()
-    .domain(getDomainX(strandsData))
-    .range([0, width])
-
-  const scaleY = scaleLinear()
-    .domain(getDomainY(strandsData))
-    .range([height, 0])
-
-  return compose(
-    reverse,
-    toArea(scaleX, scaleY, curving, dataKey)
-  )(strands)
-})
+export const makeMatureArea = curry(
+  (curving, scaleX, scaleY, getData, strand) =>
+    area()
+      .curve(curving)
+      .x0(d => scaleX(d[0]))
+      .x1(d => scaleX(d[1]))
+      .y(d => scaleY(d[2]))(getData(strand))
+)

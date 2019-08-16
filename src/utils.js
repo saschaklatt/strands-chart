@@ -56,3 +56,8 @@ export const inject = curry((target, key, data) => ({
   ...target,
   [key]: data,
 }))
+
+export const getCenter = d => {
+  const c = d[0] + (d[1] - d[0]) / 2
+  return c
+}

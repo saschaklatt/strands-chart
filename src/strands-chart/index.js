@@ -1,9 +1,16 @@
 import "./StrandsChart.css"
 import React from "react"
 import PropTypes from "prop-types"
-import { getColorByIndex, areas } from "../models/strand-areas"
+import {
+  makeMatureArea,
+  seqs2strands,
+  getDomainX,
+  getDomainY,
+  makeDiedArea,
+  makeBornArea,
+} from "../models/strand-areas"
 import { curveMonotoneY } from "d3-shape"
-import { getBemClassName } from "../utils"
+import { getBemClassName, reverse } from "../utils"
 import { timeFormat } from "d3-time-format"
 import {
   ATTR_TIME,
@@ -12,6 +19,10 @@ import {
   ATTR_DATA,
   ATTR_KEY,
 } from "../constants"
+import { select } from "d3-selection"
+import { scaleLinear } from "d3-scale"
+import { transition } from "d3-transition"
+import { getData } from "../models/StrandParser"
 
 const bem = getBemClassName("strands-chart")
 
@@ -49,26 +60,86 @@ const Lines = ({ periods }) => (
   </div>
 )
 
-const Strands = ({ width, height, curving, padding, sequences, getColor }) => (
-  <div className={bem("strands")}>
-    <svg
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      preserveAspectRatio="none"
-    >
-      {areas(width, height, curving, ATTR_DATA, sequences).map((area, idx) => (
-        <path
-          key={idx}
-          className={bem("strand")}
-          d={area[ATTR_DATA]}
-          strokeWidth={`${padding}px`}
-          fill={getColor(area)}
+class Strands extends React.Component {
+  constructor(props) {
+    super(props)
+
+    this.svg = React.createRef()
+  }
+
+  componentDidMount() {
+    this.update(this.props, this.svg, 0)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.update(nextProps, this.svg, 400)
+  }
+
+  shouldComponentUpdate() {
+    return false
+  }
+
+  update(props, ref, duration) {
+    const { width, height, curving, padding, sequences, getColor } = props
+
+    const strands = seqs2strands(sequences, ATTR_DATA)
+    const strandsData = strands.map(s => s[ATTR_DATA])
+
+    const scaleX = scaleLinear()
+      .domain(getDomainX(strandsData))
+      .range([0, width])
+
+    const scaleY = scaleLinear()
+      .domain(getDomainY(strandsData))
+      .range([height, 0])
+
+    const t = transition().duration(duration)
+
+    const bornArea = makeBornArea(curving, scaleX, scaleY, getData)
+    const diedArea = makeDiedArea(curving, scaleX, scaleY, getData)
+    const matureArea = makeMatureArea(curving, scaleX, scaleY, getData)
+
+    const paths = select(ref.current)
+      .selectAll("path")
+      .data(reverse(strands), d => d[ATTR_KEY])
+
+    paths
+      .enter()
+      .append("path")
+      .attr("class", bem("strand"))
+      .attr("fill", getColor)
+      .attr("stroke-width", `${padding}px`)
+      .attr("d", bornArea)
+      .transition(t)
+      .attr("d", matureArea)
+
+    paths
+      .merge(paths)
+      .transition(t)
+      .attr("d", matureArea)
+
+    paths
+      .exit()
+      .transition(t)
+      .attr("d", diedArea)
+      .remove()
+  }
+
+  render() {
+    const { width, height } = this.props
+    return (
+      <div className={bem("strands")}>
+        <svg
+          width={width}
+          height={height}
+          viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="none"
+          ref={this.svg}
         />
-      ))}
-    </svg>
-  </div>
-)
+      </div>
+    )
+  }
+}
 
 const StrandsChart = props => (
   <figure className={bem()} style={{ height: `${props.height}px` }}>
