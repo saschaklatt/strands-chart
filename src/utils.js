@@ -43,9 +43,11 @@ export function curry(func, arity = func.length) {
 
 export const add = a => b => a + b
 
+export const increase = add(1)
+
 export const nest = key => d => ({ [key]: d })
 
-export const inject = target => key => data => ({
+export const inject = curry((target, key, data) => ({
   ...target,
   [key]: data,
-})
+}))

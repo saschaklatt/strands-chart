@@ -9,9 +9,9 @@ import {
   reverse,
   isNilDomain,
   getDomainSize,
-  add,
   inject,
   curry,
+  increase,
 } from "../utils"
 import { COLORS } from "../constants"
 import compose from "lodash/fp/compose"
@@ -41,13 +41,12 @@ const moveValue = dx => v => (isNil(v) ? null : v + dx)
 
 const setValue = x => v => (isNil(v) ? null : x)
 
-const extendSilhouette = dir => sil => seq => {
-  return sil.map((t, i) => {
+const extendSilhouette = dir => sil => seq =>
+  sil.map((t, i) => {
     const dx = seq[i] * dir
     const move = moveValue(dx)
     return dir < 0 ? [move(t[0]), t[1]] : [t[0], move(t[1])]
   })
-}
 
 const snuggle = dir => targetStrand => baseStrand =>
   baseStrand.map((pair, i) => {
@@ -70,7 +69,7 @@ const makeInitialSilhouette = height => makeVerticalStrand(0, height)
 const makeSilhouette = dataKey =>
   compose(
     makeInitialSilhouette,
-    add(1), // why add one?
+    increase,
     getDomainSize,
     getDomainY,
     extract(dataKey)
@@ -99,7 +98,7 @@ const seqs2strands = (
     snuggleWithSilhouette,
     strandFromSequence
   )
-  const newStrands = [...strands, inject(seq)(dataKey)(makeStrand(seqData))]
+  const newStrands = [...strands, inject(seq, dataKey, makeStrand(seqData))]
 
   return seqs2strands(sequences, dataKey, newSilhouette, newStrands, i + 1)
 }
@@ -114,7 +113,7 @@ const getRightValues = data => data.map(pair => pair[1])
 
 const toArea = curry((scaleX, scaleY, curving, dataKey, strands) =>
   strands.map(strand =>
-    inject(strand)(dataKey)(
+    inject(strand, dataKey)(
       area()
         .curve(curving)
         .x0(d => scaleX(d[0]))

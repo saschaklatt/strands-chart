@@ -10,6 +10,7 @@ import {
   ATTR_HEIGHT,
   ATTR_Y,
   ATTR_DATA,
+  ATTR_KEY,
 } from "../models/time-periods"
 
 const bem = getBemClassName("strands-chart")
@@ -80,7 +81,10 @@ const StrandsChart = props => (
   </figure>
 )
 
-const SequencePropType = PropTypes.arrayOf(PropTypes.number)
+const SequencePropType = PropTypes.shape({
+  [ATTR_KEY]: PropTypes.string,
+  [ATTR_DATA]: PropTypes.arrayOf(PropTypes.number),
+})
 
 const PeriodPropType = PropTypes.shape({
   [ATTR_TIME]: PropTypes.object.isRequired,
