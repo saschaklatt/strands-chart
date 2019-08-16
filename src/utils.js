@@ -57,7 +57,8 @@ export const inject = curry((target, key, data) => ({
   [key]: data,
 }))
 
-export const getCenter = d => {
-  const c = d[0] + (d[1] - d[0]) / 2
-  return c
-}
+export const getCenter = d => d[0] + (d[1] - d[0]) / 2
+
+export const attrDiffers = curry(
+  (base, target, attr) => base[attr] !== target[attr]
+)

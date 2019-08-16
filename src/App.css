@@ -9,6 +9,7 @@
 
 .selection {
   display: flex;
+  flex-wrap: wrap;
 }
 .selection > div {
   margin: 0 10px;
