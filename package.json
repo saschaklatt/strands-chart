@@ -1,6 +1,6 @@
 {
   "name": "strands-chart",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Diagram, based on React and D3, to compare values of different ranges over time in the form of strands.",
   "author": "Sascha Klatt",
   "license": "MIT",
