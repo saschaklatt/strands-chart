@@ -67,11 +67,6 @@
   text-align: right;
 }
 
-.strands-chart--sections > div > div > span:first-of-type {
-  font-weight: bold;
-  padding-right: 6px;
-}
-
 .strands-chart--strands {
   flex: 0 1 auto;
 }

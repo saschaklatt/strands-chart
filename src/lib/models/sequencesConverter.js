@@ -1,6 +1,6 @@
 import isNil from "lodash/isNil"
 import compose from "lodash/fp/compose"
-import { ATTR_COLOR, ATTR_DIRECTION } from "./lib/models/selectors"
+import { ATTR_COLOR, ATTR_DIRECTION } from "./selectors"
 
 /**
  * Converts the base format grouped by years into strands grouped by data items.

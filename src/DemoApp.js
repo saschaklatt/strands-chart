@@ -1,14 +1,17 @@
 import "./DemoApp.css"
 import React from "react"
-import StrandsChart from "./lib"
+import StrandsChart, {
+  importSequences,
+  importTimePeriods,
+  seqs2strands,
+  ATTR_COLOR,
+  ATTR_DATA,
+  ATTR_KEY,
+} from "./lib"
 import LANG_USAGE from "./data/languages-usage.json"
 import TIME_PERIODS from "./data/time-periods.json"
-import { importSequences } from "./sequencesParser"
-import { importTimePeriods } from "./lib/models/timePeriodsConverter"
 import { timeParse } from "d3-time-format"
 import compose from "lodash/fp/compose"
-import { ATTR_KEY, ATTR_COLOR, ATTR_DATA } from "./lib/models/selectors"
-import { seqs2strands } from "./lib/models/strandsConverter"
 
 const CustomSection = ({ data }) => (
   <>
