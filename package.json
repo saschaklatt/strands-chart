@@ -1,8 +1,18 @@
 {
   "name": "strands-chart",
   "version": "0.1.0",
-  "private": true,
+  "description": "Diagram, based on React and D3, to compare values of different ranges over time in the form of strands.",
+  "author": "Sascha Klatt",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "dependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-react": "^7.0.0",
     "d3-array": "^2.2.0",
     "d3-scale": "^3.0.1",
     "d3-selection": "^1.4.0",
@@ -13,15 +23,33 @@
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1"
+    "react-scripts": "3.0.1",
+    "rimraf": "^3.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build:examples": "react-scripts build",
+    "build": "rimraf dist && NODE_ENV=production babel src/lib --out-dir dist --copy-files --ignore __tests__,spec.js,test.js,__snapshots__",
     "test": "react-scripts test",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "eject": "react-scripts eject"
   },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:klattiation/strands-chart.git"
+  },
+  "homepage": "https://github.com/klattiation/strands-chart",
+  "keywords": [
+    "chart",
+    "react",
+    "d3",
+    "sequences",
+    "strand",
+    "fiber",
+    "area",
+    "time",
+    "visualization"
+  ],
   "eslintConfig": {
     "extends": "react-app"
   },

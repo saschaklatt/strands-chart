@@ -1,0 +1,85 @@
+.strands-chart {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: row;
+}
+
+.strands-chart--lined {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex: 1 0 0px;
+  min-width: 0;
+}
+
+.strands-chart--lines,
+.strands-chart--dates,
+.strands-chart--sections {
+  height: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+}
+
+.strands-chart--lines {
+  position: absolute;
+  width: 100%;
+  z-index: -1;
+}
+
+.strands-chart--lines > span {
+  width: 100%;
+  border-bottom: 1px dashed #333;
+}
+
+.strands-chart--dates {
+  flex: 0 1 auto;
+}
+
+.strands-chart--dates > span {
+  display: flex;
+  align-items: flex-end;
+  transform: translateY(10px);
+  margin-right: 10px;
+}
+
+.strands-chart--sections {
+  flex: 1 1 0;
+  overflow: hidden;
+}
+
+.strands-chart--sections > div {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1 1 0;
+}
+
+.strands-chart--sections > div > div {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: right;
+}
+
+.strands-chart--sections > div > div > span:first-of-type {
+  font-weight: bold;
+  padding-right: 6px;
+}
+
+.strands-chart--strands {
+  flex: 0 1 auto;
+}
+
+.strands-chart--strands > svg {
+  min-width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 100%;
+}
+
+.strands-chart .strands-chart--strand {
+  stroke: #fdfff0;
+  opacity: 0.9;
+}
