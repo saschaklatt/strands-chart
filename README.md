@@ -2,9 +2,20 @@
 
 Diagram, based on React and D3, to compare values of different ranges over time in the form of strands.
 
+<img src="./docs/screenshot.png">
+
 ## Install
 
-`npm i --save strands-chart`
+There's no npm version available yet. It can still be installed by adding the following line to your dependencies in your package.json file:
+
+    "dependencies": {
+      "strands-chart": "klattiation/strands-chart",
+      ...
+    }
+
+## Usage / API
+
+Coming soon...
 
 ## Available Scripts
 
