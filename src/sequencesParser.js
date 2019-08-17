@@ -1,6 +1,6 @@
-import { isNil } from "../utils"
+import isNil from "lodash/isNil"
 import compose from "lodash/fp/compose"
-import { ATTR_COLOR, ATTR_DIRECTION } from "../constants"
+import { ATTR_COLOR, ATTR_DIRECTION } from "./lib/models/selectors"
 
 /**
  * Converts the base format grouped by years into strands grouped by data items.
@@ -42,7 +42,7 @@ import { ATTR_COLOR, ATTR_DIRECTION } from "../constants"
 
 const getYear = d => (d && d.year ? d.year : null)
 
-export const getData = d => (d && d.data ? d.data : [])
+const getData = d => (d && d.data ? d.data : [])
 
 const makeValueSelector = d => value => getData(d)[value] || 0
 
@@ -100,7 +100,7 @@ const addDirection = arr =>
     [ATTR_DIRECTION]: i % 2 ? 1 : -1,
   }))
 
-export const importUsages = (input, colors) => {
+export const importSequences = (input, colors) => {
   const sorted = sortByYear(input)
   const keys = filterKeys(getData)(sorted)
   return compose(

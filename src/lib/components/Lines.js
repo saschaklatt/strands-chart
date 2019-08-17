@@ -1,5 +1,5 @@
 import React from "react"
-import { bem } from "."
+import { bem } from "./StrandsChart"
 
 const Lines = ({ periods }) => (
   <div className={bem("lines")}>

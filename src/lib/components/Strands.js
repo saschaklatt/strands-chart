@@ -1,46 +1,39 @@
 import "./StrandsChart.css"
 import React from "react"
-import PropTypes from "prop-types"
-import {
-  makeMatureArea,
-  seqs2strands,
-  getDomainX,
-  getDomainY,
-  makeDiedArea,
-  makeBornArea,
-} from "../models/strand-areas"
-import { ATTR_DATA, ATTR_KEY } from "../constants"
 import { select } from "d3-selection"
 import { scaleLinear } from "d3-scale"
 import { transition } from "d3-transition"
-import { getData } from "../models/StrandParser"
-import { bem } from "."
-import { reverse, attrDiffers } from "../utils"
+import {
+  makeMatureArea,
+  makeDeadArea,
+  makeNewBornArea,
+} from "../models/areaUtils"
+import { getDomainX, getDomainY } from "../models/strandUtils"
+import { ATTR_DATA, ATTR_KEY, getData } from "../models/selectors"
+import { reverse, atLeastOneDiffers } from "../utils"
+import { bem } from "./StrandsChart"
 
 class Strands extends React.Component {
   constructor(props) {
     super(props)
-
     this.svg = React.createRef()
   }
 
   componentDidMount() {
-    this.update(this.props, this.svg, 0)
+    this.updateViz(this.props, this.svg, true)
   }
 
   componentWillReceiveProps(nextProps) {
-    this.update(nextProps, this.svg, 400)
+    this.updateViz(nextProps, this.svg, false)
   }
 
   shouldComponentUpdate(nextProps) {
-    const propDiffers = attrDiffers(this.props, nextProps)
-    return propDiffers("width") || propDiffers("height")
+    return atLeastOneDiffers(this.props, nextProps, ["width", "height"])
   }
 
-  update(props, ref, duration) {
-    const { width, height, curving, padding, sequences, getColor } = props
+  updateViz(props, ref, isInitial) {
+    const { width, height, curving, padding, strands, getColor } = props
 
-    const strands = seqs2strands(sequences, ATTR_DATA)
     const strandsData = strands.map(s => s[ATTR_DATA])
 
     const scaleX = scaleLinear()
@@ -51,15 +44,17 @@ class Strands extends React.Component {
       .domain(getDomainY(strandsData))
       .range([height, 0])
 
+    const duration = isInitial ? 0 : 400
+
     const t = transition().duration(duration)
     const tEnter = transition().duration(duration)
-    if (duration > 0) {
+    if (isInitial) {
       tEnter.delay(duration / 10)
     }
 
-    const bornArea = makeBornArea(curving, scaleX, scaleY, getData)
-    const diedArea = makeDiedArea(curving, scaleX, scaleY, getData)
+    const newBornArea = makeNewBornArea(curving, scaleX, scaleY, getData)
     const matureArea = makeMatureArea(curving, scaleX, scaleY, getData)
+    const deadArea = makeDeadArea(curving, scaleX, scaleY, getData)
 
     const paths = select(ref.current)
       .selectAll("path")
@@ -72,7 +67,7 @@ class Strands extends React.Component {
       .attr("fill", getColor)
       .attr("stroke-width", 0)
       .style("opacity", 0)
-      .attr("d", bornArea)
+      .attr("d", newBornArea)
       .transition(tEnter)
       .style("opacity", 1)
       .attr("stroke-width", `${padding}px`)
@@ -86,8 +81,8 @@ class Strands extends React.Component {
     paths
       .exit()
       .transition(t)
+      .attr("d", deadArea)
       .style("opacity", 0)
-      .attr("d", diedArea)
       .remove()
   }
 

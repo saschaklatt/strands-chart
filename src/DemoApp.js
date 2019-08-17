@@ -1,28 +1,20 @@
-import "./App.css"
+import "./DemoApp.css"
 import React from "react"
-import StrandsChart from "./strands-chart"
+import StrandsChart from "./lib"
 import LANG_USAGE from "./data/languages-usage.json"
 import TIME_PERIODS from "./data/time-periods.json"
-import { importUsages } from "./models/StrandParser"
-import { importTimePeriods } from "./models/time-periods"
+import { importSequences } from "./sequencesParser"
+import { importTimePeriods } from "./lib/models/timePeriodsConverter"
 import { timeParse } from "d3-time-format"
 import compose from "lodash/fp/compose"
-import { COLORS, ATTR_KEY, ATTR_COLOR } from "./constants"
+import { ATTR_KEY, ATTR_COLOR, ATTR_DATA } from "./lib/models/selectors"
+import { seqs2strands } from "./lib/models/strandsConverter"
 
 const CustomSection = ({ data }) => (
   <>
     <span>{data.position}</span>
     <span>{`@ ${data.organisation}`}</span>
   </>
-)
-
-const parseTime = timeParse("%m/%Y") // "month/year": 09/2016
-
-const getStart = d => d.start
-
-const getDate = compose(
-  parseTime,
-  getStart
 )
 
 const Selection = ({ sequences, selection = [], onChange }) => (
@@ -45,14 +37,21 @@ class App extends React.Component {
   constructor(props) {
     super(props)
 
+    const parseTime = timeParse("%m/%Y") // "month/year": 09/2016
+
+    const getStart = d => d.start
+
     const periods = importTimePeriods({
       periods: TIME_PERIODS,
       today: new Date(),
       getKey: getStart,
       height: props.height,
-      getDate,
+      getDate: compose(
+        parseTime,
+        getStart
+      ),
     })
-    const sequences = importUsages(LANG_USAGE, COLORS)
+    const sequences = importSequences(LANG_USAGE, props.colors)
 
     this.state = {
       sequences,
@@ -64,12 +63,9 @@ class App extends React.Component {
   handleSelectionChange = key => {
     this.setState(({ selection }) => {
       const i = selection.indexOf(key)
-      if (i >= 0) {
-        return { selection: selection.filter(k => k !== key) }
-      }
-      return {
-        selection: [...selection, key],
-      }
+      return i >= 0
+        ? { selection: selection.filter(k => k !== key) }
+        : { selection: [...selection, key] }
     })
   }
 
@@ -77,7 +73,7 @@ class App extends React.Component {
     const { width, height } = this.props
     const { selection, sequences, periods } = this.state
     const visibleSequences = sequences.filter(s => selection.includes(s.key))
-    // console.log("sequences", visibleSequences)
+    const strands = seqs2strands(visibleSequences, ATTR_DATA)
     return (
       <div className="App">
         <Selection
@@ -88,7 +84,7 @@ class App extends React.Component {
         <StrandsChart
           width={width}
           height={height}
-          sequences={visibleSequences}
+          strands={strands}
           periods={periods}
           renderSection={CustomSection}
           getColor={d => d[ATTR_COLOR]}
@@ -100,6 +96,18 @@ class App extends React.Component {
 App.defaultProps = {
   width: 460,
   height: 720,
+  colors: [
+    "#FF8A3C",
+    "#F74444",
+    "#93BFC7",
+    "#4F795C",
+    "#B672BC",
+    "#39638D",
+    "#F8F025",
+    "#4E6ED6",
+    "#B29D28",
+    "#72BC78",
+  ],
 }
 
 export default App

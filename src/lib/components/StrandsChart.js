@@ -10,7 +10,9 @@ import {
   ATTR_Y,
   ATTR_DATA,
   ATTR_KEY,
-} from "../constants"
+  ATTR_COLOR,
+  ATTR_DIRECTION,
+} from "../models/selectors"
 import Strands from "./Strands"
 import Lines from "./Lines"
 import Sections from "./Sections"
@@ -20,8 +22,11 @@ export const bem = getBemClassName("strands-chart")
 
 export const makeDateRenderer = format => ({ time }) => timeFormat(format)(time)
 
-export const makeSectionRenderer = () => (period, idx) => (
-  <>{`Section ${idx}`}</>
+export const makeSectionRenderer = () => ({ data }, idx) => (
+  <>
+    <strong>{`Section ${idx}`}</strong>
+    <pre>{JSON.stringify(data)}</pre>
+  </>
 )
 
 const StrandsChart = props => (
@@ -35,9 +40,13 @@ const StrandsChart = props => (
   </figure>
 )
 
-const SequencePropType = PropTypes.shape({
-  [ATTR_KEY]: PropTypes.string,
-  [ATTR_DATA]: PropTypes.arrayOf(PropTypes.number),
+const NumberListPropTypes = PropTypes.arrayOf(PropTypes.number)
+
+const StrandPropType = PropTypes.shape({
+  [ATTR_KEY]: PropTypes.string.isRequired,
+  [ATTR_COLOR]: PropTypes.string.isRequired,
+  [ATTR_DIRECTION]: PropTypes.number.isRequired,
+  [ATTR_DATA]: PropTypes.arrayOf(NumberListPropTypes).isRequired,
 })
 
 const PeriodPropType = PropTypes.shape({
@@ -52,7 +61,7 @@ StrandsChart.propTypes = {
   padding: PropTypes.number,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
-  sequences: PropTypes.arrayOf(SequencePropType).isRequired,
+  strands: PropTypes.arrayOf(StrandPropType).isRequired,
   periods: PropTypes.arrayOf(PeriodPropType).isRequired,
   renderDate: PropTypes.func.isRequired,
   renderSection: PropTypes.func.isRequired,

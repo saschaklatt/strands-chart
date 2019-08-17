@@ -1,5 +1,3 @@
-export const isNil = v => v === null || v === undefined
-
 export const isNotNil = v => v !== null && v !== undefined
 
 export const reverse = arr => {
@@ -26,11 +24,6 @@ export const trace = (msg = "trace") => v => {
   console.log(msg, v)
   return v
 }
-
-export const isNilDomain = d => isNil(d) || isNil(d[0]) || isNil(d[1])
-
-export const getDomainSize = d =>
-  isNilDomain(d) ? null : Math.abs(d[1] - d[0])
 
 /**
  * Copied from:
@@ -62,3 +55,15 @@ export const getCenter = d => d[0] + (d[1] - d[0]) / 2
 export const attrDiffers = curry(
   (base, target, attr) => base[attr] !== target[attr]
 )
+
+const checkOneDiffers = (isDifferent, attrs, idx = 0) => {
+  if (idx === attrs.length) {
+    return false
+  }
+  return isDifferent(attrs[idx])
+    ? true
+    : checkOneDiffers(isDifferent, attrs, idx + 1)
+}
+
+export const atLeastOneDiffers = (base, target, attrs) =>
+  checkOneDiffers(attrDiffers(base, target), attrs)

@@ -1,6 +1,6 @@
 import { min } from "d3-array"
 import { scaleTime } from "d3-scale"
-import { isLast, trace } from "../utils"
+import { isLast } from "../utils"
 import compose from "lodash/fp/compose"
 import {
   ATTR_TIME,
@@ -8,11 +8,8 @@ import {
   ATTR_KEY,
   ATTR_HEIGHT,
   ATTR_Y,
-} from "../constants"
-
-const getTime = d => d[ATTR_TIME]
-
-const getData = d => d[ATTR_DATA]
+} from "./selectors"
+import { getData, getTime } from "./selectors"
 
 const nestData = periods => periods.map(p => ({ [ATTR_DATA]: { ...p } }))
 
