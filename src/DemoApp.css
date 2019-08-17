@@ -14,3 +14,8 @@
 .selection > div {
   margin: 0 10px;
 }
+
+.strands-chart--sections > div > div > span:first-of-type {
+  font-weight: bold;
+  padding-right: 6px;
+}
