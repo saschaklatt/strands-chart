@@ -69,7 +69,7 @@ class Strands extends React.Component {
       .style("opacity", 0)
       .attr("d", newBornArea)
       .transition(tEnter)
-      .style("opacity", 1)
+      .style("opacity", 0.9)
       .attr("stroke-width", `${padding}px`)
       .attr("d", matureArea)
 

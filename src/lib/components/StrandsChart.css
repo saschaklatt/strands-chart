@@ -25,7 +25,6 @@
 .strands-chart--lines {
   position: absolute;
   width: 100%;
-  z-index: -1;
 }
 
 .strands-chart--lines > span {
@@ -42,6 +41,11 @@
   align-items: flex-end;
   transform: translateY(10px);
   margin-right: 10px;
+}
+
+.strands-chart--strands,
+.strands-chart--sections {
+  position: relative;
 }
 
 .strands-chart--sections {
@@ -81,5 +85,4 @@
 
 .strands-chart .strands-chart--strand {
   stroke: #fdfff0;
-  opacity: 0.9;
 }

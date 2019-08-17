@@ -72,7 +72,7 @@ function (_React$Component) {
       var paths = select(ref.current).selectAll("path").data(reverse(strands), function (d) {
         return d[ATTR_KEY];
       });
-      paths.enter().append("path").attr("class", bem("strand")).attr("fill", getColor).attr("stroke-width", 0).style("opacity", 0).attr("d", newBornArea).transition(tEnter).style("opacity", 1).attr("stroke-width", "".concat(padding, "px")).attr("d", matureArea);
+      paths.enter().append("path").attr("class", bem("strand")).attr("fill", getColor).attr("stroke-width", 0).style("opacity", 0).attr("d", newBornArea).transition(tEnter).style("opacity", 0.9).attr("stroke-width", "".concat(padding, "px")).attr("d", matureArea);
       paths.merge(paths).transition(t).attr("d", matureArea);
       paths.exit().transition(t).attr("d", deadArea).style("opacity", 0).remove();
     }
