@@ -28,11 +28,11 @@ A full example can be found here: <a href="./src/DemoApp.js">DemoApp</a>
 - renderDate: A render prop to render each date.
 - renderSection: A render props to render each section.
 
-### Data structure
+## Data structure
 
 The chart uses two data sources: strands and periods.
 
-#### Sequences
+### Sequences
 
 A sequence is a list of numbers that represent the different widths of each area. A width is treated as a relative value compared to the width of other sequences. That means if sequence A has width of 1 at index 0 and sequence B has a width of 2 at index 0, then sequence B will be twice as wide as sequence A at index 0.
 
@@ -47,7 +47,7 @@ A single sequence looks like this:
 
 Sequences will be sorted by their surface area and then positioned alternately left and right on the y-axis.
 
-#### Periods
+### Periods
 
 Periods are the sections in which the chart is divided vertically.
 
@@ -106,9 +106,9 @@ Will transform your base data into this:
 ]
 ```
 
-### Custom components
+## Custom components
 
-#### renderDate
+### renderDate
 
 In order to customise your **dates** you can pass a `renderSection` render prop into the StrandChart.
 
@@ -123,7 +123,7 @@ const Demo = () => <StrandsChart renderDate={CustomDate} ... />
 
 The function provided in `renderDate` receives the data object of a single section as the first parameter and the current index as the second parameter.
 
-#### renderPeriod
+### renderPeriod
 
 In order to customise your **period** sections you can pass a `renderSection` render prop into the StrandChart.
 
