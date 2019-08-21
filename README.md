@@ -17,11 +17,22 @@ There's no npm version available yet. It can still be installed from GitHub by a
 
 A full example can be found here: <a href="./src/DemoApp.js">DemoApp</a>
 
+## Props
+
+- curving: The D3 curving function to curve the areas.
+- padding: The stroke width of the areas.
+- width: The total width of all strands.
+- height: The total height of the chart.
+- sequences: The strand data in form of sequences.
+- periods: The period data.
+- renderDate: A render prop to render each date.
+- renderSection: A render props to render each section.
+
 ### Data structure
 
 The chart uses two data sources: strands and periods.
 
-### Sequences
+#### Sequences
 
 A sequence is a list of numbers that represent the different widths of each area. A width is treated as a relative value compared to the width of other sequences. That means if sequence A has width of 1 at index 0 and sequence B has a width of 2 at index 0, then sequence B will be twice as wide as sequence A at index 0.
 
@@ -36,7 +47,7 @@ A single sequence looks like this:
 
 Sequences will be sorted by their surface area and then positioned alternately left and right on the y-axis.
 
-### Periods
+#### Periods
 
 Periods are the sections in which the chart is divided vertically.
 
@@ -59,13 +70,13 @@ Your input data could look like this:
 Using the `importTimePeriods` function like this:
 
 ```javascript
-import TIME_PERIODS from "./data/time-periods.json" // see src/data/time-periods.json
+import periods from "./data/time-periods.json" // see src/data/time-periods.json
 
 importTimePeriods({
-  periods: TIME_PERIODS, // data source
+  height: height, // the chart height
+  periods: periods, // data source
   today: new Date(), // the date where the chart ends (might be renamed in future versions)
   getKey: d => d.start, // extracts a unique key for each period
-  height: height, // the chart height
   getDate: d => d3.timeParse("%m%Y")(d.start), // extracts the date from each period as a JavaScript Date object
 })
 ```
@@ -90,12 +101,31 @@ Will transform your base data into this:
 ]
 ```
 
-In order to display your sections you can pass a `renderSection` render prop into the StrandChart.
+### Custom components
+
+#### renderDate
+
+In order to customise your **dates** you can pass a `renderSection` render prop into the StrandChart.
+
+```jsx
+import StrandsChart from "strands-chart"
+import { timeFormat } from "d3-time-format"
+
+const CustomDate = ({ time }) => timeFormat("%m/%Y")(time)
+
+const Demo = () => <StrandsChart renderDate={CustomDate} ... />
+```
+
+The function provided in `renderDate` receives the data object of a single section as the first parameter and the current index as the second parameter.
+
+#### renderPeriod
+
+In order to customise your **period** sections you can pass a `renderSection` render prop into the StrandChart.
 
 ```jsx
 import StrandsChart from "strands-chart"
 
-const CustomSection = (({ data }), idx) => (
+const CustomPeriod = (({ data }), idx) => (
   <>
     <span>{`Position: ${data.position}`}</span>
     <span>{`Organisation: ${data.organisation}`}</span>
@@ -103,18 +133,7 @@ const CustomSection = (({ data }), idx) => (
   </>
 )
 
-const Demo = () => <StrandsChart renderSection={CustomSection} ... />
+const Demo = () => <StrandsChart renderPeriod={CustomPeriod} ... />
 ```
 
-The function provided in `renderSection` receives the data object of a single section as the first parameter and the current index as the second parameter.
-
-## Props
-
-- curving: The D3 curving function to curve the areas.
-- padding: The stroke width of the areas.
-- width: The total width of all strands.
-- height: The total height of the chart.
-- sequences: The strand data in form of sequences.
-- periods: The period data.
-- renderDate: A render prop to render each date.
-- renderSection: A render props to render each section.
+The function provided in `renderPeriod` receives the data object of a single section as the first parameter and the current index as the second parameter.
