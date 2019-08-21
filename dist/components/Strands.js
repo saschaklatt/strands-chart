@@ -10,9 +10,11 @@ import { scaleLinear } from "d3-scale";
 import { transition } from "d3-transition";
 import { makeMatureArea, makeDeadArea, makeNewBornArea } from "../models/areaUtils";
 import { getDomainX, getDomainY } from "../models/strandUtils";
-import { ATTR_DATA, ATTR_KEY, getData } from "../models/selectors";
+import { ATTR_DATA, ATTR_KEY, getData, getColor } from "../models/selectors";
 import { reverse, atLeastOneDiffers } from "../utils";
 import { bem } from "./StrandsChart";
+import { seqs2strands } from "../models/strandsConverter";
+import { StrandsPropTypes } from "../propTypes";
 
 var Strands =
 /*#__PURE__*/
@@ -51,8 +53,8 @@ function (_React$Component) {
           height = props.height,
           curving = props.curving,
           padding = props.padding,
-          strands = props.strands,
-          getColor = props.getColor;
+          sequences = props.sequences;
+      var strands = seqs2strands(sequences, ATTR_DATA);
       var strandsData = strands.map(function (s) {
         return s[ATTR_DATA];
       });

@@ -3,19 +3,19 @@ import React from "react";
 import { curveMonotoneY } from "d3-shape";
 import { getBemClassName } from "../utils";
 import { timeFormat } from "d3-time-format";
-import { ATTR_TIME, ATTR_HEIGHT, ATTR_Y, ATTR_DATA, ATTR_KEY, ATTR_COLOR, ATTR_DIRECTION } from "../models/selectors";
 import Strands from "./Strands";
 import Lines from "./Lines";
-import Sections from "./Sections";
+import Periods from "./Periods";
 import Dates from "./Dates";
+import { StrandsChartPropTypes } from "../propTypes";
 export var bem = getBemClassName("strands-chart");
-export var makeDateRenderer = function makeDateRenderer(format) {
+export var makeStandardDateRenderer = function makeStandardDateRenderer(format) {
   return function (_ref) {
     var time = _ref.time;
     return timeFormat(format)(time);
   };
 };
-export var makeSectionRenderer = function makeSectionRenderer() {
+export var makeStandardPeriodRenderer = function makeStandardPeriodRenderer() {
   return function (_ref2, idx) {
     var data = _ref2.data;
     return React.createElement(React.Fragment, null, React.createElement("strong", null, "Section ".concat(idx)), React.createElement("pre", null, JSON.stringify(data)));
@@ -30,13 +30,13 @@ var StrandsChart = function StrandsChart(props) {
     }
   }, React.createElement(Dates, props), React.createElement("div", {
     className: bem("lined")
-  }, React.createElement(Lines, props), React.createElement(Strands, props), React.createElement(Sections, props)));
+  }, React.createElement(Lines, props), React.createElement(Strands, props), React.createElement(Periods, props)));
 };
 
 StrandsChart.defaultProps = {
   curving: curveMonotoneY,
   padding: 3,
-  renderDate: makeDateRenderer("%Y"),
-  renderSection: makeSectionRenderer()
+  renderDate: makeStandardDateRenderer("%Y"),
+  renderSection: makeStandardPeriodRenderer()
 };
 export default StrandsChart;

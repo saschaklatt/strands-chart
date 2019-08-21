@@ -1,6 +1,6 @@
 import _defineProperty from "@babel/runtime/helpers/esm/defineProperty";
 import _objectSpread from "@babel/runtime/helpers/esm/objectSpread";
-import { min } from "d3-array";
+import { min, max } from "d3-array";
 import { scaleTime } from "d3-scale";
 import { isLast } from "../utils";
 import compose from "lodash/fp/compose";
@@ -49,11 +49,12 @@ var addKey = function addKey(getKey) {
 export var importTimePeriods = function importTimePeriods(_ref2) {
   var periods = _ref2.periods,
       height = _ref2.height,
-      today = _ref2.today,
+      dateFrom = _ref2.dateFrom,
+      dateTo = _ref2.dateTo,
       getKey = _ref2.getKey,
       getDate = _ref2.getDate;
   var nestedPeriods = compose(addTime(getDate), addKey(getKey), nestData)(periods);
-  var domainY = [min(nestedPeriods, getTime), today];
+  var domainY = [dateFrom || min(nestedPeriods, getTime), dateTo || max(nestedPeriods, getTime)];
   var rangeY = [height, 0];
   var scaleY = scaleTime().domain(domainY).range(rangeY);
   return compose(addHeight(rangeY), addY(scaleY))(nestedPeriods);

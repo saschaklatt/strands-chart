@@ -33,7 +33,7 @@ import { ATTR_COLOR, ATTR_DIRECTION } from "./selectors";
  * [
  *   {
  *     key: "js",
- *     data: [null, 1, 2, 2, 3, 1, 0, 0, 0, 1, null],
+ *     data: [0, 1, 2, 2, 3, 1, 0, 0, 0, 1, 0],
  *   },
  *   {
  *     key: "php",

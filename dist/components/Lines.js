@@ -1,5 +1,6 @@
 import React from "react";
 import { bem } from "./StrandsChart";
+import { LinesPropTypes } from "../propTypes";
 
 var Lines = function Lines(_ref) {
   var periods = _ref.periods;

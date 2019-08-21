@@ -1,5 +1,6 @@
 import React from "react";
 import { bem } from "./StrandsChart";
+import { DatesPropTypes } from "../propTypes";
 
 var Dates = function Dates(_ref) {
   var periods = _ref.periods,
