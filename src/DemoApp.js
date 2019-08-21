@@ -3,9 +3,7 @@ import React from "react"
 import StrandsChart, {
   importSequences,
   importTimePeriods,
-  seqs2strands,
   ATTR_COLOR,
-  ATTR_DATA,
   ATTR_KEY,
 } from "./lib"
 import LANG_USAGE from "./data/languages-usage.json"
@@ -76,7 +74,6 @@ class App extends React.Component {
     const { width, height } = this.props
     const { selection, sequences, periods } = this.state
     const visibleSequences = sequences.filter(s => selection.includes(s.key))
-    const strands = seqs2strands(visibleSequences, ATTR_DATA)
     return (
       <div className="App">
         <Selection
@@ -87,7 +84,7 @@ class App extends React.Component {
         <StrandsChart
           width={width}
           height={height}
-          strands={strands}
+          sequences={visibleSequences}
           periods={periods}
           renderSection={CustomSection}
           getColor={d => d[ATTR_COLOR]}

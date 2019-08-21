@@ -12,6 +12,7 @@ import { getDomainX, getDomainY } from "../models/strandUtils"
 import { ATTR_DATA, ATTR_KEY, getData } from "../models/selectors"
 import { reverse, atLeastOneDiffers } from "../utils"
 import { bem } from "./StrandsChart"
+import { seqs2strands } from "../models/strandsConverter"
 
 class Strands extends React.Component {
   constructor(props) {
@@ -32,7 +33,10 @@ class Strands extends React.Component {
   }
 
   updateViz(props, ref, isInitial) {
-    const { width, height, curving, padding, strands, getColor } = props
+    const { width, height, curving, padding, sequences, getColor } = props
+
+    const strands = seqs2strands(sequences, ATTR_DATA)
+    console.log(strands)
 
     const strandsData = strands.map(s => s[ATTR_DATA])
 

@@ -42,6 +42,11 @@ const StrandsChart = props => (
 
 const NumberListPropTypes = PropTypes.arrayOf(PropTypes.number)
 
+const SequencePropType = PropTypes.shape({
+  [ATTR_KEY]: PropTypes.string.isRequired,
+  [ATTR_DATA]: PropTypes.arrayOf(PropTypes.number).isRequired,
+})
+
 const StrandPropType = PropTypes.shape({
   [ATTR_KEY]: PropTypes.string.isRequired,
   [ATTR_COLOR]: PropTypes.string.isRequired,
@@ -61,7 +66,7 @@ StrandsChart.propTypes = {
   padding: PropTypes.number,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
-  strands: PropTypes.arrayOf(StrandPropType).isRequired,
+  sequences: PropTypes.arrayOf(SequencePropType).isRequired,
   periods: PropTypes.arrayOf(PeriodPropType).isRequired,
   renderDate: PropTypes.func.isRequired,
   renderSection: PropTypes.func.isRequired,
