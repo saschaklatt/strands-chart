@@ -1,6 +1,6 @@
 # StrandsChart
 
-Fully responsive diagram, based on React and D3, to compare values of different ranges over time in the form of strands. It's like a vertically stacked area chart where the areas are arranged alternately left and right around the y-axis.
+Interactive and fully responsive diagram, based on React and D3, to compare values of different ranges over time in the form of strands. It's like a vertically stacked area chart where the areas are arranged alternately left and right around the y-axis.
 
 <img src="./docs/screenshot.png">
 
