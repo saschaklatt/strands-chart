@@ -1,6 +1,11 @@
 import "./DemoApp.css"
 import React from "react"
-import StrandsChart, { importSequences, importTimePeriods, getKey } from "./lib"
+import StrandsChart, {
+  importSequences,
+  importTimePeriods,
+  getKey,
+  getColor,
+} from "./lib"
 import LANG_USAGE from "./data/languages-usage.json"
 import TIME_PERIODS from "./data/time-periods.json"
 import { timeParse } from "d3-time-format"
@@ -13,19 +18,25 @@ const CustomPeriod = ({ data }) => (
   </>
 )
 
-const Selection = ({ sequences, selection = [], onChange }) => (
+const SelectionBar = ({ sequences, selection = [], onChange }) => (
   <div className="selection">
-    {sequences.map(({ key }, idx) => (
-      <div key={key}>
-        <input
-          type="checkbox"
-          id={key}
-          checked={selection.includes(key)}
-          onChange={onChange.bind(this, key, idx)}
-        />
-        <label htmlFor={key}>{key}</label>
-      </div>
-    ))}
+    {sequences.map((seq, idx) => {
+      const key = getKey(seq)
+      return (
+        <div key={key}>
+          <input
+            type="checkbox"
+            id={key}
+            checked={selection.includes(key)}
+            onChange={onChange.bind(this, key, idx)}
+          />
+          <label htmlFor={key}>
+            <span className="circle" style={{ color: getColor(seq) }} />
+            {key}
+          </label>
+        </div>
+      )
+    })}
   </div>
 )
 
@@ -71,7 +82,7 @@ class App extends React.Component {
     const visibleSequences = sequences.filter(s => selection.includes(s.key))
     return (
       <div className="App">
-        <Selection
+        <SelectionBar
           sequences={sequences}
           selection={selection}
           onChange={this.handleSelectionChange}

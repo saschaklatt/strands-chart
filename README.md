@@ -34,7 +34,7 @@ The chart uses two data sources: strands and periods.
 
 ### Sequences
 
-A sequence is a list of numbers that represent the different widths of each area. A width is treated as a relative value compared to the width of other sequences. That means if sequence A has width of 1 at index 0 and sequence B has a width of 2 at index 0, then sequence B will be twice as wide as sequence A at index 0.
+A sequence is a list of numbers that represent the different widths of each area (or strand). A width is treated as a relative value compared to the width of the other sequences. That means if sequence A has width of 1 at index 0 and sequence B has a width of 2 at index 0, then sequence B will be twice as wide as sequence A at index 0. The conversion into pixel values is based on the `width` prop.
 
 A single sequence looks like this:
 

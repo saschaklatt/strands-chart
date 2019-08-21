@@ -19,3 +19,7 @@
   font-weight: bold;
   padding-right: 6px;
 }
+.circle:before {
+  content: " \25CF";
+  font-size: 10px;
+}
