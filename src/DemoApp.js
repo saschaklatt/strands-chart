@@ -1,17 +1,12 @@
 import "./DemoApp.css"
 import React from "react"
-import StrandsChart, {
-  importSequences,
-  importTimePeriods,
-  ATTR_COLOR,
-  ATTR_KEY,
-} from "./lib"
+import StrandsChart, { importSequences, importTimePeriods, getKey } from "./lib"
 import LANG_USAGE from "./data/languages-usage.json"
 import TIME_PERIODS from "./data/time-periods.json"
 import { timeParse } from "d3-time-format"
 import compose from "lodash/fp/compose"
 
-const CustomSection = ({ data }) => (
+const CustomPeriod = ({ data }) => (
   <>
     <span>{data.position}</span>
     <span>{`@ ${data.organisation}`}</span>
@@ -57,7 +52,7 @@ class App extends React.Component {
     this.state = {
       sequences,
       periods,
-      selection: sequences.map(s => s[ATTR_KEY]),
+      selection: sequences.map(getKey),
     }
   }
 
@@ -86,8 +81,7 @@ class App extends React.Component {
           height={height}
           sequences={visibleSequences}
           periods={periods}
-          renderSection={CustomSection}
-          getColor={d => d[ATTR_COLOR]}
+          renderPeriod={CustomPeriod}
         />
       </div>
     )

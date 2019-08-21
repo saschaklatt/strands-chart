@@ -95,15 +95,26 @@ In order to display your sections you can pass a `renderSection` render prop int
 ```jsx
 import StrandsChart from "strands-chart"
 
-const CustomSection = ({ data }) => (
-  <ul>
-    <li>{`Position: ${data.position}`}</li>
-    <li>{`Organisation: ${data.organisation}`}</li>
-    <li>{`Location: ${data.location}`}</li>
-  </ul>
+const CustomSection = (({ data }), idx) => (
+  <>
+    <span>{`Position: ${data.position}`}</span>
+    <span>{`Organisation: ${data.organisation}`}</span>
+    <span>{`Location: ${data.location}`}</span>
+  </>
 )
 
 const Demo = () => <StrandsChart renderSection={CustomSection} ... />
 ```
 
-The CustomSection receives all the data from your base format as a `data` prop.
+The function provided in `renderSection` receives the data object of a single section as the first parameter and the current index as the second parameter.
+
+## Props
+
+- curving: The D3 curving function to curve the areas.
+- padding: The stroke width of the areas.
+- width: The total width of all strands.
+- height: The total height of the chart.
+- sequences: The strand data in form of sequences.
+- periods: The period data.
+- renderDate: A render prop to render each date.
+- renderSection: A render props to render each section.

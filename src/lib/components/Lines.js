@@ -1,5 +1,6 @@
 import React from "react"
 import { bem } from "./StrandsChart"
+import { LinesPropTypes } from "../propTypes"
 
 const Lines = ({ periods }) => (
   <div className={bem("lines")}>
@@ -8,5 +9,7 @@ const Lines = ({ periods }) => (
     ))}
   </div>
 )
+
+Lines.propTypes = LinesPropTypes
 
 export default Lines

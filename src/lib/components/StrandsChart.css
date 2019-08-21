@@ -15,7 +15,7 @@
 
 .strands-chart--lines,
 .strands-chart--dates,
-.strands-chart--sections {
+.strands-chart--periods {
   height: 100%;
   display: flex;
   flex-direction: column-reverse;
@@ -44,23 +44,23 @@
 }
 
 .strands-chart--strands,
-.strands-chart--sections {
+.strands-chart--periods {
   position: relative;
 }
 
-.strands-chart--sections {
+.strands-chart--periods {
   flex: 1 1 0;
   overflow: hidden;
 }
 
-.strands-chart--sections > div {
+.strands-chart--periods > div {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   flex: 1 1 0;
 }
 
-.strands-chart--sections > div > div {
+.strands-chart--periods > div > div {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;

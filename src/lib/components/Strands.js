@@ -9,10 +9,11 @@ import {
   makeNewBornArea,
 } from "../models/areaUtils"
 import { getDomainX, getDomainY } from "../models/strandUtils"
-import { ATTR_DATA, ATTR_KEY, getData } from "../models/selectors"
+import { ATTR_DATA, ATTR_KEY, getData, getColor } from "../models/selectors"
 import { reverse, atLeastOneDiffers } from "../utils"
 import { bem } from "./StrandsChart"
 import { seqs2strands } from "../models/strandsConverter"
+import { StrandsPropTypes } from "../propTypes"
 
 class Strands extends React.Component {
   constructor(props) {
@@ -33,11 +34,9 @@ class Strands extends React.Component {
   }
 
   updateViz(props, ref, isInitial) {
-    const { width, height, curving, padding, sequences, getColor } = props
+    const { width, height, curving, padding, sequences } = props
 
     const strands = seqs2strands(sequences, ATTR_DATA)
-    console.log(strands)
-
     const strandsData = strands.map(s => s[ATTR_DATA])
 
     const scaleX = scaleLinear()
@@ -105,5 +104,7 @@ class Strands extends React.Component {
     )
   }
 }
+
+Strands.propTypes = StrandsPropTypes
 
 export default Strands

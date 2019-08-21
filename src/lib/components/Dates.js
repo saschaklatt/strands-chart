@@ -1,5 +1,6 @@
 import React from "react"
 import { bem } from "./StrandsChart"
+import { DatesPropTypes } from "../propTypes"
 
 const Dates = ({ periods, renderDate }) => (
   <div className={bem("dates")}>
@@ -10,5 +11,7 @@ const Dates = ({ periods, renderDate }) => (
     ))}
   </div>
 )
+
+Dates.propTypes = DatesPropTypes
 
 export default Dates
