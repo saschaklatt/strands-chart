@@ -1,4 +1,4 @@
-import { min } from "d3-array"
+import { min, max } from "d3-array"
 import { scaleTime } from "d3-scale"
 import { isLast } from "../utils"
 import compose from "lodash/fp/compose"
@@ -50,7 +50,8 @@ const addKey = getKey => periods =>
 export const importTimePeriods = ({
   periods,
   height,
-  today,
+  dateFrom,
+  dateTo,
   getKey,
   getDate,
 }) => {
@@ -59,7 +60,10 @@ export const importTimePeriods = ({
     addKey(getKey),
     nestData
   )(periods)
-  const domainY = [min(nestedPeriods, getTime), today]
+  const domainY = [
+    dateFrom || min(nestedPeriods, getTime),
+    dateTo || max(nestedPeriods, getTime),
+  ]
   const rangeY = [height, 0]
   const scaleY = scaleTime()
     .domain(domainY)

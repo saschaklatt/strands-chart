@@ -71,13 +71,18 @@ Using the `importTimePeriods` function like this:
 
 ```javascript
 import periods from "./data/time-periods.json" // see src/data/time-periods.json
+import { timeParse } from "d3-time-format"
+
+const parseTime = timeParse("%m%Y")
+const today = new Date()
 
 importTimePeriods({
-  height: height, // the chart height
-  periods: periods, // data source
-  today: new Date(), // the date where the chart ends (might be renamed in future versions)
+  height, // the chart height
+  periods, // data source
   getKey: d => d.start, // extracts a unique key for each period
-  getDate: d => d3.timeParse("%m%Y")(d.start), // extracts the date from each period as a JavaScript Date object
+  getDate: d => parseTime(d.start), // extracts the date from each period as a JavaScript Date object
+  dateFrom: parseTime("01/2004"), // optional, the start date of the y-axis (will be calculated from the data, if left out)
+  dateTo: today, // optional, the end date of the y-axis (will be calculated from the data, if left out)
 })
 ```
 

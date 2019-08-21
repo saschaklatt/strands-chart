@@ -39,9 +39,9 @@ class App extends React.Component {
 
     const periods = importTimePeriods({
       periods: TIME_PERIODS,
-      today: new Date(),
       getKey: getStart,
       height: props.height,
+      dateTo: new Date(),
       getDate: compose(
         parseTime,
         getStart

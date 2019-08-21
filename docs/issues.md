@@ -1,9 +1,6 @@
 # Issues / TODOs
 
 - The `width` prop describes the width of the inner svg, not the entire chart, which might be confusing.
-- `importTimePeriods`: today key should be renamed to `endDate` or something...
-- Adding direction, color and surface area sorting should be done in strandConverter, instead of sequencesConverter
-- Add documentation
 - Configure y-direction via prop
 - Use TypeScript
 - Add tests
