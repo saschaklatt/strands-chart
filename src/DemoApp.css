@@ -7,6 +7,10 @@
   padding: 0 20px;
 }
 
+.strands-chart {
+  max-width: 1200px;
+}
+
 .selection {
   display: flex;
   flex-wrap: wrap;

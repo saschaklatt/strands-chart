@@ -1,6 +1,7 @@
 # Issues / TODOs
 
 - The `width` prop describes the width of the inner svg, not the entire chart, which might be confusing.
+- Improve build/publish process (automatic versioning and building)
 - Host the demo app
 - Configure y-direction via prop
 - Use TypeScript
