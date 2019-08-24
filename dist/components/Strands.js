@@ -78,7 +78,6 @@ function (_React$Component) {
       var newBornArea = makeNewBornArea(curving, scaleX, scaleY, getData);
       var matureArea = makeMatureArea(curving, scaleX, scaleY, getData);
       var deadArea = makeDeadArea(curving, scaleX, scaleY, getData);
-      console.log("update");
       var paths = select(ref.current).selectAll("path").data(reverse(strands), function (d) {
         return d[ATTR_KEY];
       });

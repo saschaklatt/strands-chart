@@ -69,8 +69,6 @@ class Strands extends React.Component {
     const matureArea = makeMatureArea(curving, scaleX, scaleY, getData)
     const deadArea = makeDeadArea(curving, scaleX, scaleY, getData)
 
-    console.log("update")
-
     const paths = select(ref.current)
       .selectAll("path")
       .data(reverse(strands), d => d[ATTR_KEY])
