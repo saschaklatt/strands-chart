@@ -24,6 +24,7 @@ A full example can be found here: <a href="./src/DemoApp.js">DemoApp</a>
 - width: The total width of all strands.
 - height: The total height of the chart.
 - sequences: The strand data in form of sequences.
+- selectedIdx: An optional index of the item that should be selected.
 - periods: The period data.
 - renderDate: A render prop to render each date.
 - renderSection: A render props to render each section.
