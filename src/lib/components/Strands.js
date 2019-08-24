@@ -105,7 +105,7 @@ class Strands extends React.Component {
       addClass(classNameHighlight).call(this)
     }
 
-    const lowlight = function(d, i) {
+    const lowlight = function() {
       const classNameLowlight = getClassNameLowlight()
       const classNameHighlight = getClassNameHighlight()
       const all = svg.selectAll("path")
@@ -156,6 +156,8 @@ class Strands extends React.Component {
     if (isNotNil(selectedIdx)) {
       const reverseIdx = data.length - 1 - selectedIdx
       highlight.call(getNodeByIndex(svg, reverseIdx))
+    } else {
+      lowlight()
     }
   }
 
