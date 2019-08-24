@@ -2,6 +2,25 @@ import _objectSpread from "@babel/runtime/helpers/esm/objectSpread";
 import _defineProperty from "@babel/runtime/helpers/esm/defineProperty";
 import _toConsumableArray from "@babel/runtime/helpers/esm/toConsumableArray";
 import _toArray from "@babel/runtime/helpers/esm/toArray";
+
+/**
+ * Copied from:
+ * https://stackoverflow.com/questions/48293642/js-curry-function-with-recursion
+ */
+export function curry(func) {
+  var arity = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : func.length;
+  return function () {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    if (args.length >= arity) {
+      return func.apply(void 0, args);
+    } else {
+      return curry(func.bind.apply(func, [this].concat(args)), arity - args.length);
+    }
+  };
+}
 export var isNotNil = function isNotNil(v) {
   return v !== null && v !== undefined;
 };
@@ -39,25 +58,6 @@ export var trace = function trace() {
     return v;
   };
 };
-/**
- * Copied from:
- * https://stackoverflow.com/questions/48293642/js-curry-function-with-recursion
- */
-
-export function curry(func) {
-  var arity = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : func.length;
-  return function () {
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    if (args.length >= arity) {
-      return func.apply(void 0, args);
-    } else {
-      return curry(func.bind.apply(func, [this].concat(args)), arity - args.length);
-    }
-  };
-}
 export var add = function add(a) {
   return function (b) {
     return a + b;

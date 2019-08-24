@@ -1,6 +1,6 @@
 {
   "name": "strands-chart",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Interactive and fully responsive diagram, based on React and D3, to compare values of different ranges over time in the form of strands. It's like a vertically stacked area chart where the areas are arranged alternately left and right around the y-axis.",
   "author": "Sascha Klatt",
   "license": "MIT",
@@ -33,6 +33,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "build:all": "npm run build && npm run build:examples",
     "build:examples": "react-scripts build",
     "build": "rimraf dist && NODE_ENV=production babel src/lib --out-dir dist --copy-files --ignore __tests__,spec.js,test.js,__snapshots__",
     "test": "react-scripts test",

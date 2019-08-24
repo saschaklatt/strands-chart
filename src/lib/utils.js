@@ -1,3 +1,17 @@
+/**
+ * Copied from:
+ * https://stackoverflow.com/questions/48293642/js-curry-function-with-recursion
+ */
+export function curry(func, arity = func.length) {
+  return function(...args) {
+    if (args.length >= arity) {
+      return func(...args)
+    } else {
+      return curry(func.bind(this, ...args), arity - args.length)
+    }
+  }
+}
+
 export const isNotNil = v => v !== null && v !== undefined
 
 export const reverse = arr => {
@@ -23,20 +37,6 @@ export const isLast = (arr, idx) => idx === arr.length - 1
 export const trace = (msg = "trace") => v => {
   console.log(msg, v)
   return v
-}
-
-/**
- * Copied from:
- * https://stackoverflow.com/questions/48293642/js-curry-function-with-recursion
- */
-export function curry(func, arity = func.length) {
-  return function(...args) {
-    if (args.length >= arity) {
-      return func(...args)
-    } else {
-      return curry(func.bind(this, ...args), arity - args.length)
-    }
-  }
 }
 
 export const add = a => b => a + b

@@ -16,6 +16,23 @@ import { bem } from "./StrandsChart"
 import { seqs2strands } from "../models/strandsConverter"
 import { StrandsPropTypes } from "../propTypes"
 
+const BEM_EL = "strand"
+const BEM_MOD_HI = "highlight"
+const BEM_MOD_LO = "lowlight"
+
+const getClassNameHighlight = () => bem(BEM_EL, BEM_MOD_HI)
+const getClassNameLowlight = () => bem(BEM_EL, BEM_MOD_LO)
+
+const addClass = className =>
+  function() {
+    select(this).classed(className, true)
+  }
+
+const removeClass = className =>
+  function() {
+    select(this).classed(className, false)
+  }
+
 class Strands extends React.Component {
   constructor(props) {
     super(props)
@@ -69,23 +86,40 @@ class Strands extends React.Component {
     const matureArea = makeMatureArea(curving, scaleX, scaleY, getData)
     const deadArea = makeDeadArea(curving, scaleX, scaleY, getData)
 
-    const paths = select(ref.current)
-      .selectAll("path")
-      .data(reverse(strands), d => d[ATTR_KEY])
+    const svg = select(ref.current)
+
+    const paths = svg.selectAll("path").data(reverse(strands), d => d[ATTR_KEY])
+
+    const handleMouseOver = function(d, i) {
+      const classNameLowlight = getClassNameLowlight()
+      const classNameHighlight = getClassNameHighlight()
+      svg.selectAll("path").each(addClass(classNameLowlight))
+      removeClass(classNameLowlight).call(this)
+      addClass(classNameHighlight).call(this)
+      onMouseEnterStrand(d, i)
+    }
+
+    const handleMouseOut = function(d, i) {
+      const classNameLowlight = getClassNameLowlight()
+      const classNameHighlight = getClassNameHighlight()
+      svg.selectAll("path").each(removeClass(classNameLowlight))
+      removeClass(classNameHighlight).call(this)
+      onMouseLeaveStrand(d, i)
+    }
+
+    const handleClick = (d, i) => onClickStrand(d, i)
 
     paths
       .enter()
       .append("path")
-      .on("mouseover", (d, i) => onMouseEnterStrand(d, i))
-      .on("mouseout", (d, i) => onMouseLeaveStrand(d, i))
-      .on("click", (d, i) => onClickStrand(d, i))
       .attr("class", bem("strand"))
       .attr("fill", getColor)
       .attr("stroke-width", 0)
-      .style("opacity", 0)
       .attr("d", newBornArea)
+      .on("mouseover", handleMouseOver)
+      .on("mouseout", handleMouseOut)
+      .on("click", handleClick)
       .transition(tEnter)
-      .style("opacity", 0.9)
       .attr("stroke-width", `${padding}px`)
       .attr("d", matureArea)
 
@@ -98,14 +132,13 @@ class Strands extends React.Component {
       .exit()
       .transition(t)
       .attr("d", deadArea)
-      .style("opacity", 0)
       .remove()
   }
 
   render() {
     const { width, height } = this.props
     return (
-      <div className={bem("strands")}>
+      <div className={bem(BEM_EL)}>
         <svg
           width={width}
           height={height}

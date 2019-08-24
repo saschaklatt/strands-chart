@@ -16,6 +16,29 @@ import { reverse, atLeastOneDiffers } from "../utils";
 import { bem } from "./StrandsChart";
 import { seqs2strands } from "../models/strandsConverter";
 import { StrandsPropTypes } from "../propTypes";
+var BEM_EL = "strand";
+var BEM_MOD_HI = "highlight";
+var BEM_MOD_LO = "lowlight";
+
+var getClassNameHighlight = function getClassNameHighlight() {
+  return bem(BEM_EL, BEM_MOD_HI);
+};
+
+var getClassNameLowlight = function getClassNameLowlight() {
+  return bem(BEM_EL, BEM_MOD_LO);
+};
+
+var addClass = function addClass(className) {
+  return function () {
+    select(this).classed(className, true);
+  };
+};
+
+var removeClass = function removeClass(className) {
+  return function () {
+    select(this).classed(className, false);
+  };
+};
 
 var Strands =
 /*#__PURE__*/
@@ -78,18 +101,35 @@ function (_React$Component) {
       var newBornArea = makeNewBornArea(curving, scaleX, scaleY, getData);
       var matureArea = makeMatureArea(curving, scaleX, scaleY, getData);
       var deadArea = makeDeadArea(curving, scaleX, scaleY, getData);
-      var paths = select(ref.current).selectAll("path").data(reverse(strands), function (d) {
+      var svg = select(ref.current);
+      var paths = svg.selectAll("path").data(reverse(strands), function (d) {
         return d[ATTR_KEY];
       });
-      paths.enter().append("path").on("mouseover", function (d, i) {
-        return onMouseEnterStrand(d, i);
-      }).on("mouseout", function (d, i) {
-        return onMouseLeaveStrand(d, i);
-      }).on("click", function (d, i) {
+
+      var handleMouseOver = function handleMouseOver(d, i) {
+        var classNameLowlight = getClassNameLowlight();
+        var classNameHighlight = getClassNameHighlight();
+        svg.selectAll("path").each(addClass(classNameLowlight));
+        removeClass(classNameLowlight).call(this);
+        addClass(classNameHighlight).call(this);
+        onMouseEnterStrand(d, i);
+      };
+
+      var handleMouseOut = function handleMouseOut(d, i) {
+        var classNameLowlight = getClassNameLowlight();
+        var classNameHighlight = getClassNameHighlight();
+        svg.selectAll("path").each(removeClass(classNameLowlight));
+        removeClass(classNameHighlight).call(this);
+        onMouseLeaveStrand(d, i);
+      };
+
+      var handleClick = function handleClick(d, i) {
         return onClickStrand(d, i);
-      }).attr("class", bem("strand")).attr("fill", getColor).attr("stroke-width", 0).style("opacity", 0).attr("d", newBornArea).transition(tEnter).style("opacity", 0.9).attr("stroke-width", "".concat(padding, "px")).attr("d", matureArea);
+      };
+
+      paths.enter().append("path").attr("class", bem("strand")).attr("fill", getColor).attr("stroke-width", 0).attr("d", newBornArea).on("mouseover", handleMouseOver).on("mouseout", handleMouseOut).on("click", handleClick).transition(tEnter).attr("stroke-width", "".concat(padding, "px")).attr("d", matureArea);
       paths.merge(paths).transition(t).attr("d", matureArea);
-      paths.exit().transition(t).attr("d", deadArea).style("opacity", 0).remove();
+      paths.exit().transition(t).attr("d", deadArea).remove();
     }
   }, {
     key: "render",
@@ -98,7 +138,7 @@ function (_React$Component) {
           width = _this$props.width,
           height = _this$props.height;
       return React.createElement("div", {
-        className: bem("strands")
+        className: bem(BEM_EL)
       }, React.createElement("svg", {
         width: width,
         height: height,

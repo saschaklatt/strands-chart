@@ -77,6 +77,18 @@
   min-height: 100%;
 }
 
-.strands-chart .strands-chart--strand {
+.strands-chart .strands-chart--strand,
+.strands-chart .strands-chart--strand__highlight,
+.strands-chart .strands-chart--strand__lowlight {
   stroke: #fff;
+  transition: opacity 150ms ease-in-out;
+  opacity: 0.9;
+}
+
+.strands-chart .strands-chart--strand__lowlight {
+  opacity: 0.6;
+}
+
+.strands-chart .strands-chart--strand__highlight {
+  opacity: 1;
 }
