@@ -96,6 +96,7 @@ class App extends React.Component {
           onMouseEnterStrand={(d, i) => console.log("enter", d, i)}
           onMouseLeaveStrand={(d, i) => console.log("leave", d, i)}
           onClickStrand={(d, i) => console.log("click", d, i)}
+          selectedIdx={0}
         />
       </div>
     )

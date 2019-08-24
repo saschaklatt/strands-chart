@@ -10,8 +10,8 @@ import {
   makeNewBornArea,
 } from "../models/areaUtils"
 import { getDomainX, getDomainY } from "../models/strandUtils"
-import { ATTR_DATA, ATTR_KEY, getData, getColor } from "../models/selectors"
-import { reverse, atLeastOneDiffers } from "../utils"
+import { ATTR_DATA, getData, getColor, getKey } from "../models/selectors"
+import { reverse, atLeastOneDiffers, isNotNil } from "../utils"
 import { bem } from "./StrandsChart"
 import { seqs2strands } from "../models/strandsConverter"
 import { StrandsPropTypes } from "../propTypes"
@@ -22,6 +22,12 @@ const BEM_MOD_LO = "lowlight"
 
 const getClassNameHighlight = () => bem(BEM_EL, BEM_MOD_HI)
 const getClassNameLowlight = () => bem(BEM_EL, BEM_MOD_LO)
+
+const getNodeByIndex = (svg, idx) =>
+  svg
+    .selectAll("path")
+    .filter((d, i) => i === idx)
+    .node()
 
 const addClass = className =>
   function() {
@@ -58,13 +64,14 @@ class Strands extends React.Component {
       curving,
       padding,
       sequences,
+      selectedIdx,
       onMouseEnterStrand = noop,
       onMouseLeaveStrand = noop,
       onClickStrand = noop,
     } = props
 
     const strands = seqs2strands(sequences, ATTR_DATA)
-    const strandsData = strands.map(s => s[ATTR_DATA])
+    const strandsData = strands.map(getData)
 
     const scaleX = scaleLinear()
       .domain(getDomainX(strandsData))
@@ -88,26 +95,38 @@ class Strands extends React.Component {
 
     const svg = select(ref.current)
 
-    const paths = svg.selectAll("path").data(reverse(strands), d => d[ATTR_KEY])
-
-    const handleMouseOver = function(d, i) {
+    const highlight = function(d, i) {
       const classNameLowlight = getClassNameLowlight()
       const classNameHighlight = getClassNameHighlight()
-      svg.selectAll("path").each(addClass(classNameLowlight))
+      const others = svg.selectAll("path").filter((el, idx) => i !== idx)
+      others.each(removeClass(classNameHighlight))
+      others.each(addClass(classNameLowlight))
       removeClass(classNameLowlight).call(this)
       addClass(classNameHighlight).call(this)
+    }
+
+    const lowlight = function(d, i) {
+      const classNameLowlight = getClassNameLowlight()
+      const classNameHighlight = getClassNameHighlight()
+      const all = svg.selectAll("path")
+      all.each(removeClass(classNameHighlight))
+      all.each(removeClass(classNameLowlight))
+    }
+
+    const handleMouseOver = function(d, i) {
+      highlight.call(this, d, i)
       onMouseEnterStrand(d, i)
     }
 
     const handleMouseOut = function(d, i) {
-      const classNameLowlight = getClassNameLowlight()
-      const classNameHighlight = getClassNameHighlight()
-      svg.selectAll("path").each(removeClass(classNameLowlight))
-      removeClass(classNameHighlight).call(this)
+      lowlight.call(this, d, i)
       onMouseLeaveStrand(d, i)
     }
 
     const handleClick = (d, i) => onClickStrand(d, i)
+
+    const data = reverse(strands)
+    const paths = svg.selectAll("path").data(data, getKey)
 
     paths
       .enter()
@@ -133,6 +152,11 @@ class Strands extends React.Component {
       .transition(t)
       .attr("d", deadArea)
       .remove()
+
+    if (isNotNil(selectedIdx)) {
+      const reverseIdx = data.length - 1 - selectedIdx
+      highlight.call(getNodeByIndex(svg, reverseIdx))
+    }
   }
 
   render() {

@@ -11,8 +11,8 @@ import { scaleLinear } from "d3-scale";
 import { transition } from "d3-transition";
 import { makeMatureArea, makeDeadArea, makeNewBornArea } from "../models/areaUtils";
 import { getDomainX, getDomainY } from "../models/strandUtils";
-import { ATTR_DATA, ATTR_KEY, getData, getColor } from "../models/selectors";
-import { reverse, atLeastOneDiffers } from "../utils";
+import { ATTR_DATA, getData, getColor, getKey } from "../models/selectors";
+import { reverse, atLeastOneDiffers, isNotNil } from "../utils";
 import { bem } from "./StrandsChart";
 import { seqs2strands } from "../models/strandsConverter";
 import { StrandsPropTypes } from "../propTypes";
@@ -26,6 +26,12 @@ var getClassNameHighlight = function getClassNameHighlight() {
 
 var getClassNameLowlight = function getClassNameLowlight() {
   return bem(BEM_EL, BEM_MOD_LO);
+};
+
+var getNodeByIndex = function getNodeByIndex(svg, idx) {
+  return svg.selectAll("path").filter(function (d, i) {
+    return i === idx;
+  }).node();
 };
 
 var addClass = function addClass(className) {
@@ -78,6 +84,7 @@ function (_React$Component) {
           curving = props.curving,
           padding = props.padding,
           sequences = props.sequences,
+          selectedIdx = props.selectedIdx,
           _props$onMouseEnterSt = props.onMouseEnterStrand,
           onMouseEnterStrand = _props$onMouseEnterSt === void 0 ? noop : _props$onMouseEnterSt,
           _props$onMouseLeaveSt = props.onMouseLeaveStrand,
@@ -85,9 +92,7 @@ function (_React$Component) {
           _props$onClickStrand = props.onClickStrand,
           onClickStrand = _props$onClickStrand === void 0 ? noop : _props$onClickStrand;
       var strands = seqs2strands(sequences, ATTR_DATA);
-      var strandsData = strands.map(function (s) {
-        return s[ATTR_DATA];
-      });
+      var strandsData = strands.map(getData);
       var scaleX = scaleLinear().domain(getDomainX(strandsData)).range([0, width]);
       var scaleY = scaleLinear().domain(getDomainY(strandsData)).range([height, 0]);
       var duration = isInitial ? 0 : 400;
@@ -102,24 +107,34 @@ function (_React$Component) {
       var matureArea = makeMatureArea(curving, scaleX, scaleY, getData);
       var deadArea = makeDeadArea(curving, scaleX, scaleY, getData);
       var svg = select(ref.current);
-      var paths = svg.selectAll("path").data(reverse(strands), function (d) {
-        return d[ATTR_KEY];
-      });
 
-      var handleMouseOver = function handleMouseOver(d, i) {
+      var highlight = function highlight(d, i) {
         var classNameLowlight = getClassNameLowlight();
         var classNameHighlight = getClassNameHighlight();
-        svg.selectAll("path").each(addClass(classNameLowlight));
+        var others = svg.selectAll("path").filter(function (el, idx) {
+          return i !== idx;
+        });
+        others.each(removeClass(classNameHighlight));
+        others.each(addClass(classNameLowlight));
         removeClass(classNameLowlight).call(this);
         addClass(classNameHighlight).call(this);
+      };
+
+      var lowlight = function lowlight(d, i) {
+        var classNameLowlight = getClassNameLowlight();
+        var classNameHighlight = getClassNameHighlight();
+        var all = svg.selectAll("path");
+        all.each(removeClass(classNameHighlight));
+        all.each(removeClass(classNameLowlight));
+      };
+
+      var handleMouseOver = function handleMouseOver(d, i) {
+        highlight.call(this, d, i);
         onMouseEnterStrand(d, i);
       };
 
       var handleMouseOut = function handleMouseOut(d, i) {
-        var classNameLowlight = getClassNameLowlight();
-        var classNameHighlight = getClassNameHighlight();
-        svg.selectAll("path").each(removeClass(classNameLowlight));
-        removeClass(classNameHighlight).call(this);
+        lowlight.call(this, d, i);
         onMouseLeaveStrand(d, i);
       };
 
@@ -127,9 +142,16 @@ function (_React$Component) {
         return onClickStrand(d, i);
       };
 
+      var data = reverse(strands);
+      var paths = svg.selectAll("path").data(data, getKey);
       paths.enter().append("path").attr("class", bem("strand")).attr("fill", getColor).attr("stroke-width", 0).attr("d", newBornArea).on("mouseover", handleMouseOver).on("mouseout", handleMouseOut).on("click", handleClick).transition(tEnter).attr("stroke-width", "".concat(padding, "px")).attr("d", matureArea);
       paths.merge(paths).transition(t).attr("d", matureArea);
       paths.exit().transition(t).attr("d", deadArea).remove();
+
+      if (isNotNil(selectedIdx)) {
+        var reverseIdx = data.length - 1 - selectedIdx;
+        highlight.call(getNodeByIndex(svg, reverseIdx));
+      }
     }
   }, {
     key: "render",
