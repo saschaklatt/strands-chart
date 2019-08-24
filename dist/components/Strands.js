@@ -6,13 +6,14 @@ import _inherits from "@babel/runtime/helpers/esm/inherits";
 import "./StrandsChart.css";
 import React from "react";
 import noop from "lodash/noop";
+import isNil from "lodash/isNil";
 import { select } from "d3-selection";
 import { scaleLinear } from "d3-scale";
 import { transition } from "d3-transition";
 import { makeMatureArea, makeDeadArea, makeNewBornArea } from "../models/areaUtils";
 import { getDomainX, getDomainY } from "../models/strandUtils";
 import { ATTR_DATA, getData, getColor, getKey } from "../models/selectors";
-import { reverse, atLeastOneDiffers, isNotNil } from "../utils";
+import { reverse, atLeastOneDiffers } from "../utils";
 import { bem } from "./StrandsChart";
 import { seqs2strands } from "../models/strandsConverter";
 import { StrandsPropTypes } from "../propTypes";
@@ -120,7 +121,7 @@ function (_React$Component) {
         addClass(classNameHighlight).call(this);
       };
 
-      var lowlight = function lowlight(d, i) {
+      var lowlight = function lowlight() {
         var classNameLowlight = getClassNameLowlight();
         var classNameHighlight = getClassNameHighlight();
         var all = svg.selectAll("path");
@@ -148,7 +149,9 @@ function (_React$Component) {
       paths.merge(paths).transition(t).attr("d", matureArea);
       paths.exit().transition(t).attr("d", deadArea).remove();
 
-      if (isNotNil(selectedIdx)) {
+      if (isNil(selectedIdx)) {
+        lowlight();
+      } else {
         var reverseIdx = data.length - 1 - selectedIdx;
         highlight.call(getNodeByIndex(svg, reverseIdx));
       }

@@ -1,6 +1,7 @@
 import "./StrandsChart.css"
 import React from "react"
 import noop from "lodash/noop"
+import isNil from "lodash/isNil"
 import { select } from "d3-selection"
 import { scaleLinear } from "d3-scale"
 import { transition } from "d3-transition"
@@ -11,7 +12,7 @@ import {
 } from "../models/areaUtils"
 import { getDomainX, getDomainY } from "../models/strandUtils"
 import { ATTR_DATA, getData, getColor, getKey } from "../models/selectors"
-import { reverse, atLeastOneDiffers, isNotNil } from "../utils"
+import { reverse, atLeastOneDiffers } from "../utils"
 import { bem } from "./StrandsChart"
 import { seqs2strands } from "../models/strandsConverter"
 import { StrandsPropTypes } from "../propTypes"
@@ -153,11 +154,11 @@ class Strands extends React.Component {
       .attr("d", deadArea)
       .remove()
 
-    if (isNotNil(selectedIdx)) {
+    if (isNil(selectedIdx)) {
+      lowlight()
+    } else {
       const reverseIdx = data.length - 1 - selectedIdx
       highlight.call(getNodeByIndex(svg, reverseIdx))
-    } else {
-      lowlight()
     }
   }
 
