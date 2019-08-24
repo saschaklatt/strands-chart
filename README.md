@@ -27,6 +27,9 @@ A full example can be found here: <a href="./src/DemoApp.js">DemoApp</a>
 - periods: The period data.
 - renderDate: A render prop to render each date.
 - renderSection: A render props to render each section.
+- onMouseEnterStrand: Callback when mouse enters a strand.
+- onMouseLeaveStrand: Callback when mouse leaves a strand.
+- onClickStrand: Callback when a strand is clicked.
 
 ## Data structure
 

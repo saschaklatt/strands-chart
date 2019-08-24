@@ -93,6 +93,9 @@ class App extends React.Component {
           sequences={visibleSequences}
           periods={periods}
           renderPeriod={CustomPeriod}
+          onMouseEnterStrand={(d, i) => console.log("enter", d, i)}
+          onMouseLeaveStrand={(d, i) => console.log("leave", d, i)}
+          onClickStrand={(d, i) => console.log("click", d, i)}
         />
       </div>
     )

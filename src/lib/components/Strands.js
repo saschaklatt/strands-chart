@@ -1,5 +1,6 @@
 import "./StrandsChart.css"
 import React from "react"
+import noop from "lodash/noop"
 import { select } from "d3-selection"
 import { scaleLinear } from "d3-scale"
 import { transition } from "d3-transition"
@@ -34,7 +35,16 @@ class Strands extends React.Component {
   }
 
   updateViz(props, ref, isInitial) {
-    const { width, height, curving, padding, sequences } = props
+    const {
+      width,
+      height,
+      curving,
+      padding,
+      sequences,
+      onMouseEnterStrand = noop,
+      onMouseLeaveStrand = noop,
+      onClickStrand = noop,
+    } = props
 
     const strands = seqs2strands(sequences, ATTR_DATA)
     const strandsData = strands.map(s => s[ATTR_DATA])
@@ -59,6 +69,8 @@ class Strands extends React.Component {
     const matureArea = makeMatureArea(curving, scaleX, scaleY, getData)
     const deadArea = makeDeadArea(curving, scaleX, scaleY, getData)
 
+    console.log("update")
+
     const paths = select(ref.current)
       .selectAll("path")
       .data(reverse(strands), d => d[ATTR_KEY])
@@ -66,6 +78,9 @@ class Strands extends React.Component {
     paths
       .enter()
       .append("path")
+      .on("mouseover", (d, i) => onMouseEnterStrand(d, i))
+      .on("mouseout", (d, i) => onMouseLeaveStrand(d, i))
+      .on("click", (d, i) => onClickStrand(d, i))
       .attr("class", bem("strand"))
       .attr("fill", getColor)
       .attr("stroke-width", 0)

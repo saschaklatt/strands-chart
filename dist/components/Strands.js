@@ -5,6 +5,7 @@ import _getPrototypeOf from "@babel/runtime/helpers/esm/getPrototypeOf";
 import _inherits from "@babel/runtime/helpers/esm/inherits";
 import "./StrandsChart.css";
 import React from "react";
+import noop from "lodash/noop";
 import { select } from "d3-selection";
 import { scaleLinear } from "d3-scale";
 import { transition } from "d3-transition";
@@ -53,7 +54,13 @@ function (_React$Component) {
           height = props.height,
           curving = props.curving,
           padding = props.padding,
-          sequences = props.sequences;
+          sequences = props.sequences,
+          _props$onMouseEnterSt = props.onMouseEnterStrand,
+          onMouseEnterStrand = _props$onMouseEnterSt === void 0 ? noop : _props$onMouseEnterSt,
+          _props$onMouseLeaveSt = props.onMouseLeaveStrand,
+          onMouseLeaveStrand = _props$onMouseLeaveSt === void 0 ? noop : _props$onMouseLeaveSt,
+          _props$onClickStrand = props.onClickStrand,
+          onClickStrand = _props$onClickStrand === void 0 ? noop : _props$onClickStrand;
       var strands = seqs2strands(sequences, ATTR_DATA);
       var strandsData = strands.map(function (s) {
         return s[ATTR_DATA];
@@ -71,10 +78,17 @@ function (_React$Component) {
       var newBornArea = makeNewBornArea(curving, scaleX, scaleY, getData);
       var matureArea = makeMatureArea(curving, scaleX, scaleY, getData);
       var deadArea = makeDeadArea(curving, scaleX, scaleY, getData);
+      console.log("update");
       var paths = select(ref.current).selectAll("path").data(reverse(strands), function (d) {
         return d[ATTR_KEY];
       });
-      paths.enter().append("path").attr("class", bem("strand")).attr("fill", getColor).attr("stroke-width", 0).style("opacity", 0).attr("d", newBornArea).transition(tEnter).style("opacity", 0.9).attr("stroke-width", "".concat(padding, "px")).attr("d", matureArea);
+      paths.enter().append("path").on("mouseover", function (d, i) {
+        return onMouseEnterStrand(d, i);
+      }).on("mouseout", function (d, i) {
+        return onMouseLeaveStrand(d, i);
+      }).on("click", function (d, i) {
+        return onClickStrand(d, i);
+      }).attr("class", bem("strand")).attr("fill", getColor).attr("stroke-width", 0).style("opacity", 0).attr("d", newBornArea).transition(tEnter).style("opacity", 0.9).attr("stroke-width", "".concat(padding, "px")).attr("d", matureArea);
       paths.merge(paths).transition(t).attr("d", matureArea);
       paths.exit().transition(t).attr("d", deadArea).style("opacity", 0).remove();
     }

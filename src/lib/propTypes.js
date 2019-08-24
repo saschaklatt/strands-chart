@@ -46,6 +46,12 @@ const widthPropType = PropTypes.number
 
 const paddingPropType = PropTypes.number
 
+const onMouseEnterPropType = PropTypes.func
+
+const onMouseLeavePropType = PropTypes.func
+
+const onClickPropType = PropTypes.func
+
 export const PeriodsPropTypes = {
   periods: periodsPropType.isRequired,
   renderPeriod: renderPeriodPropType.isRequired,
@@ -67,6 +73,9 @@ export const StrandsPropTypes = {
   width: widthPropType.isRequired,
   height: heightPropType.isRequired,
   sequences: sequencesPropType.isRequired,
+  onMouseEnterStrand: onMouseEnterPropType,
+  onMouseLeaveStrand: onMouseLeavePropType,
+  onClickStrand: onClickPropType,
 }
 
 export const StrandsChartPropTypes = {
@@ -78,4 +87,7 @@ export const StrandsChartPropTypes = {
   periods: periodsPropType.isRequired,
   renderDate: renderDatePropType,
   renderPeriod: renderPeriodPropType,
+  onMouseEnterStrand: onMouseEnterPropType,
+  onMouseLeaveStrand: onMouseLeavePropType,
+  onClickStrand: onClickPropType,
 }

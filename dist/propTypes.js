@@ -16,6 +16,9 @@ var curvingPropType = PropTypes.func;
 var heightPropType = PropTypes.number;
 var widthPropType = PropTypes.number;
 var paddingPropType = PropTypes.number;
+var onMouseEnterPropType = PropTypes.func;
+var onMouseLeavePropType = PropTypes.func;
+var onClickPropType = PropTypes.func;
 export var PeriodsPropTypes = {
   periods: periodsPropType.isRequired,
   renderPeriod: renderPeriodPropType.isRequired
@@ -33,7 +36,10 @@ export var StrandsPropTypes = {
   padding: paddingPropType.isRequired,
   width: widthPropType.isRequired,
   height: heightPropType.isRequired,
-  sequences: sequencesPropType.isRequired
+  sequences: sequencesPropType.isRequired,
+  onMouseEnterStrand: onMouseEnterPropType,
+  onMouseLeaveStrand: onMouseLeavePropType,
+  onClickStrand: onClickPropType
 };
 export var StrandsChartPropTypes = {
   curving: curvingPropType,
@@ -43,5 +49,8 @@ export var StrandsChartPropTypes = {
   sequences: sequencesPropType.isRequired,
   periods: periodsPropType.isRequired,
   renderDate: renderDatePropType,
-  renderPeriod: renderPeriodPropType
+  renderPeriod: renderPeriodPropType,
+  onMouseEnterStrand: onMouseEnterPropType,
+  onMouseLeaveStrand: onMouseLeavePropType,
+  onClickStrand: onClickPropType
 };
