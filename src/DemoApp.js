@@ -53,10 +53,7 @@ class App extends React.Component {
       getKey: getStart,
       height: props.height,
       dateTo: new Date(),
-      getDate: compose(
-        parseTime,
-        getStart
-      ),
+      getDate: compose(parseTime, getStart),
     })
     const sequences = importSequences(LANG_USAGE, props.colors)
 
@@ -96,7 +93,6 @@ class App extends React.Component {
           onMouseEnterStrand={(d, i) => console.log("enter", d, i)}
           onMouseLeaveStrand={(d, i) => console.log("leave", d, i)}
           onClickStrand={(d, i) => console.log("click", d, i)}
-          selectedIdx={0}
         />
       </div>
     )
