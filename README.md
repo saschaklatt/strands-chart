@@ -17,7 +17,7 @@ There's no npm version available yet. It can still be installed from GitHub by a
 
 A full example can be found here: <a href="./src/DemoApp.js">DemoApp</a>
 
-To start the demo, first install all peer-dependencies with `npm run install-peers` and then start the app with `npm start`.
+To start the demo, first install all dependecies, including peer-dependencies with `npm run setup` and then start the app with `npm start`.
 
 ## Props
 
