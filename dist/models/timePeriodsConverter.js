@@ -1,5 +1,5 @@
 import _defineProperty from "@babel/runtime/helpers/esm/defineProperty";
-import _objectSpread from "@babel/runtime/helpers/esm/objectSpread";
+import _objectSpread from "@babel/runtime/helpers/esm/objectSpread2";
 import { min, max } from "d3-array";
 import { scaleTime } from "d3-scale";
 import { isLast } from "../utils";

@@ -46,11 +46,12 @@ export var StrandsChartPropTypes = {
   padding: paddingPropType,
   width: widthPropType.isRequired,
   height: heightPropType.isRequired,
-  sequences: sequencesPropType.isRequired,
+  onMouseEnterStrand: onMouseEnterPropType,
+  onMouseLeaveStrand: onMouseLeavePropType,
+  onClickStrand: onClickPropType,
   periods: periodsPropType.isRequired,
   renderDate: renderDatePropType,
   renderPeriod: renderPeriodPropType,
-  onMouseEnterStrand: onMouseEnterPropType,
-  onMouseLeaveStrand: onMouseLeavePropType,
-  onClickStrand: onClickPropType
+  selectedIdx: PropTypes.number,
+  sequences: sequencesPropType.isRequired
 };

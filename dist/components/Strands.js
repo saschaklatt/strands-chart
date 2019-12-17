@@ -1,7 +1,9 @@
+import _toConsumableArray from "@babel/runtime/helpers/esm/toConsumableArray";
 import _classCallCheck from "@babel/runtime/helpers/esm/classCallCheck";
 import _createClass from "@babel/runtime/helpers/esm/createClass";
 import _possibleConstructorReturn from "@babel/runtime/helpers/esm/possibleConstructorReturn";
 import _getPrototypeOf from "@babel/runtime/helpers/esm/getPrototypeOf";
+import _assertThisInitialized from "@babel/runtime/helpers/esm/assertThisInitialized";
 import _inherits from "@babel/runtime/helpers/esm/inherits";
 import "./StrandsChart.css";
 import React from "react";
@@ -59,10 +61,16 @@ function (_React$Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Strands).call(this, props));
     _this.svg = React.createRef();
+    _this.getSequences = _this.getSequences.bind(_assertThisInitialized(_this));
     return _this;
   }
 
   _createClass(Strands, [{
+    key: "getSequences",
+    value: function getSequences() {
+      return this.props.sequences;
+    }
+  }, {
     key: "componentDidMount",
     value: function componentDidMount() {
       this.updateViz(this.props, this.svg, true);
@@ -80,6 +88,8 @@ function (_React$Component) {
   }, {
     key: "updateViz",
     value: function updateViz(props, ref, isInitial) {
+      var _this2 = this;
+
       var width = props.width,
           height = props.height,
           curving = props.curving,
@@ -121,7 +131,7 @@ function (_React$Component) {
         addClass(classNameHighlight).call(this);
       };
 
-      var lowlight = function lowlight() {
+      var resetHighlight = function resetHighlight() {
         var classNameLowlight = getClassNameLowlight();
         var classNameHighlight = getClassNameHighlight();
         var all = svg.selectAll("path");
@@ -129,29 +139,41 @@ function (_React$Component) {
         all.each(removeClass(classNameLowlight));
       };
 
-      var handleMouseOver = function handleMouseOver(d, i) {
-        highlight.call(this, d, i);
-        onMouseEnterStrand(d, i);
+      var handleMouseOver = function handleMouseOver(d) {
+        var seqs = _this2.getSequences();
+
+        var idx = seqs.findIndex(function (s) {
+          return s.key === d.key;
+        });
+        onMouseEnterStrand(d, idx, _toConsumableArray(seqs));
       };
 
-      var handleMouseOut = function handleMouseOut(d, i) {
-        lowlight.call(this, d, i);
-        onMouseLeaveStrand(d, i);
+      var handleMouseOut = function handleMouseOut(d) {
+        var seqs = _this2.getSequences();
+
+        var idx = seqs.findIndex(function (s) {
+          return s.key === d.key;
+        });
+        onMouseLeaveStrand(d, idx, _toConsumableArray(seqs));
       };
 
-      var handleClick = function handleClick(d, i) {
-        return onClickStrand(d, i);
+      var handleClick = function handleClick(d) {
+        var seqs = _this2.getSequences();
+
+        var idx = seqs.findIndex(function (s) {
+          return s.key === d.key;
+        });
+        onClickStrand(d, idx, _toConsumableArray(seqs));
       };
 
       var data = reverse(strands);
       var paths = svg.selectAll("path").data(data, getKey);
-      paths.enter().append("path").attr("class", bem("strand")).attr("fill", getColor).attr("stroke-width", 0).attr("d", newBornArea).on("mouseover", handleMouseOver).on("mouseout", handleMouseOut).on("click", handleClick).transition(tEnter).attr("stroke-width", "".concat(padding, "px")).attr("d", matureArea);
+      paths.enter().append("path").attr("class", bem("strand")).attr("fill", getColor).attr("stroke-width", 0).attr("d", newBornArea).on("click", handleClick).on("mouseover", handleMouseOver).on("mouseout", handleMouseOut).transition(tEnter).attr("stroke-width", "".concat(padding, "px")).attr("d", matureArea).selectAll("path");
       paths.merge(paths).transition(t).attr("d", matureArea);
       paths.exit().transition(t).attr("d", deadArea).remove();
+      resetHighlight();
 
-      if (isNil(selectedIdx)) {
-        lowlight();
-      } else {
+      if (!isNil(selectedIdx)) {
         var reverseIdx = data.length - 1 - selectedIdx;
         highlight.call(getNodeByIndex(svg, reverseIdx));
       }

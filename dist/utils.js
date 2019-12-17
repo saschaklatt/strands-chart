@@ -1,4 +1,4 @@
-import _objectSpread from "@babel/runtime/helpers/esm/objectSpread";
+import _objectSpread from "@babel/runtime/helpers/esm/objectSpread2";
 import _defineProperty from "@babel/runtime/helpers/esm/defineProperty";
 import _toConsumableArray from "@babel/runtime/helpers/esm/toConsumableArray";
 import _toArray from "@babel/runtime/helpers/esm/toArray";

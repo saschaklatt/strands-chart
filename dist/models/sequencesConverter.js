@@ -1,6 +1,6 @@
 import _slicedToArray from "@babel/runtime/helpers/esm/slicedToArray";
 import _defineProperty from "@babel/runtime/helpers/esm/defineProperty";
-import _objectSpread from "@babel/runtime/helpers/esm/objectSpread";
+import _objectSpread from "@babel/runtime/helpers/esm/objectSpread2";
 import _toConsumableArray from "@babel/runtime/helpers/esm/toConsumableArray";
 import isNil from "lodash/isNil";
 import compose from "lodash/fp/compose";
