@@ -50,6 +50,8 @@ const onMouseEnterPropType = PropTypes.func
 
 const onMouseLeavePropType = PropTypes.func
 
+const onMouseMovePropType = PropTypes.func
+
 const onClickPropType = PropTypes.func
 
 export const PeriodsPropTypes = {
@@ -85,6 +87,7 @@ export const StrandsChartPropTypes = {
   height: heightPropType.isRequired,
   onMouseEnterStrand: onMouseEnterPropType,
   onMouseLeaveStrand: onMouseLeavePropType,
+  onMouseMove: onMouseMovePropType,
   onClickStrand: onClickPropType,
   periods: periodsPropType.isRequired,
   renderDate: renderDatePropType,

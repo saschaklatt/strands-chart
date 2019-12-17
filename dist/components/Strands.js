@@ -8,7 +8,7 @@ import _inherits from "@babel/runtime/helpers/esm/inherits";
 import React from "react";
 import noop from "lodash/noop";
 import isNil from "lodash/isNil";
-import { select } from "d3-selection";
+import { select, event } from "d3-selection";
 import { scaleLinear } from "d3-scale";
 import { transition } from "d3-transition";
 import { makeMatureArea, makeDeadArea, makeNewBornArea } from "../models/areaUtils";
@@ -61,6 +61,9 @@ function (_React$Component) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Strands).call(this, props));
     _this.svg = React.createRef();
     _this.getSequences = _this.getSequences.bind(_assertThisInitialized(_this));
+    _this.startMoveTracking = _this.startMoveTracking.bind(_assertThisInitialized(_this));
+    _this.handleMouseMove = _this.handleMouseMove.bind(_assertThisInitialized(_this));
+    _this.stopMoveTracking = _this.stopMoveTracking.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -70,14 +73,45 @@ function (_React$Component) {
       return this.props.sequences;
     }
   }, {
+    key: "startMoveTracking",
+    value: function startMoveTracking(d, idx) {
+      if (window) {
+        select(window).on("mousemove", this.handleMouseMove(d, idx)).on("mouseup", this.stopMoveTracking);
+      }
+    }
+  }, {
+    key: "handleMouseMove",
+    value: function handleMouseMove(d, idx) {
+      var _this2 = this;
+
+      return function () {
+        var pos = [event.pageX, event.pageY];
+
+        if (_this2.props.onMouseMove) {
+          _this2.props.onMouseMove(pos, d, idx);
+        }
+      };
+    }
+  }, {
+    key: "stopMoveTracking",
+    value: function stopMoveTracking() {
+      select(window).on("mousemove", null).on("mouseup", null);
+    }
+  }, {
     key: "componentDidMount",
     value: function componentDidMount() {
-      this.updateViz(this.props, this.svg, true);
+      this.d3Svg = select(this.svg.current);
+      this.updateViz(this.props, this.d3Svg, true);
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      this.stopMoveTracking();
     }
   }, {
     key: "componentWillReceiveProps",
     value: function componentWillReceiveProps(nextProps) {
-      this.updateViz(nextProps, this.svg, false);
+      this.updateViz(nextProps, this.d3Svg, false);
     }
   }, {
     key: "shouldComponentUpdate",
@@ -86,8 +120,8 @@ function (_React$Component) {
     }
   }, {
     key: "updateViz",
-    value: function updateViz(props, ref, isInitial) {
-      var _this2 = this;
+    value: function updateViz(props, svg, isInitial) {
+      var _this3 = this;
 
       var width = props.width,
           height = props.height,
@@ -116,7 +150,6 @@ function (_React$Component) {
       var newBornArea = makeNewBornArea(curving, scaleX, scaleY, getData);
       var matureArea = makeMatureArea(curving, scaleX, scaleY, getData);
       var deadArea = makeDeadArea(curving, scaleX, scaleY, getData);
-      var svg = select(ref.current);
 
       var highlight = function highlight(d, i) {
         var classNameLowlight = getClassNameLowlight();
@@ -139,25 +172,29 @@ function (_React$Component) {
       };
 
       var handleMouseOver = function handleMouseOver(d) {
-        var seqs = _this2.getSequences();
+        var seqs = _this3.getSequences();
 
         var idx = seqs.findIndex(function (s) {
           return s.key === d.key;
         });
         onMouseEnterStrand(d, idx, _toConsumableArray(seqs));
+
+        _this3.startMoveTracking(d, idx);
       };
 
       var handleMouseOut = function handleMouseOut(d) {
-        var seqs = _this2.getSequences();
+        var seqs = _this3.getSequences();
 
         var idx = seqs.findIndex(function (s) {
           return s.key === d.key;
         });
         onMouseLeaveStrand(d, idx, _toConsumableArray(seqs));
+
+        _this3.stopMoveTracking(d, idx);
       };
 
       var handleClick = function handleClick(d) {
-        var seqs = _this2.getSequences();
+        var seqs = _this3.getSequences();
 
         var idx = seqs.findIndex(function (s) {
           return s.key === d.key;

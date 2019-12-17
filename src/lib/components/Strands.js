@@ -1,7 +1,7 @@
 import React from "react"
 import noop from "lodash/noop"
 import isNil from "lodash/isNil"
-import { select } from "d3-selection"
+import { select, event } from "d3-selection"
 import { scaleLinear } from "d3-scale"
 import { transition } from "d3-transition"
 import {
@@ -44,25 +44,56 @@ class Strands extends React.Component {
     super(props)
     this.svg = React.createRef()
     this.getSequences = this.getSequences.bind(this)
+    this.startMoveTracking = this.startMoveTracking.bind(this)
+    this.handleMouseMove = this.handleMouseMove.bind(this)
+    this.stopMoveTracking = this.stopMoveTracking.bind(this)
   }
 
   getSequences() {
     return this.props.sequences
   }
 
+  startMoveTracking(d, idx) {
+    if (window) {
+      select(window)
+        .on("mousemove", this.handleMouseMove(d, idx))
+        .on("mouseup", this.stopMoveTracking)
+    }
+  }
+
+  handleMouseMove(d, idx) {
+    return () => {
+      const pos = [event.pageX, event.pageY]
+      if (this.props.onMouseMove) {
+        this.props.onMouseMove(pos, d, idx)
+      }
+    }
+  }
+
+  stopMoveTracking() {
+    select(window)
+      .on("mousemove", null)
+      .on("mouseup", null)
+  }
+
   componentDidMount() {
-    this.updateViz(this.props, this.svg, true)
+    this.d3Svg = select(this.svg.current)
+    this.updateViz(this.props, this.d3Svg, true)
+  }
+
+  componentWillUnmount() {
+    this.stopMoveTracking()
   }
 
   componentWillReceiveProps(nextProps) {
-    this.updateViz(nextProps, this.svg, false)
+    this.updateViz(nextProps, this.d3Svg, false)
   }
 
   shouldComponentUpdate(nextProps) {
     return atLeastOneDiffers(this.props, nextProps, ["width", "height"])
   }
 
-  updateViz(props, ref, isInitial) {
+  updateViz(props, svg, isInitial) {
     const {
       width,
       height,
@@ -98,8 +129,6 @@ class Strands extends React.Component {
     const matureArea = makeMatureArea(curving, scaleX, scaleY, getData)
     const deadArea = makeDeadArea(curving, scaleX, scaleY, getData)
 
-    const svg = select(ref.current)
-
     const highlight = function(d, i) {
       const classNameLowlight = getClassNameLowlight()
       const classNameHighlight = getClassNameHighlight()
@@ -122,12 +151,14 @@ class Strands extends React.Component {
       const seqs = this.getSequences()
       const idx = seqs.findIndex(s => s.key === d.key)
       onMouseEnterStrand(d, idx, [...seqs])
+      this.startMoveTracking(d, idx)
     }
 
     const handleMouseOut = d => {
       const seqs = this.getSequences()
       const idx = seqs.findIndex(s => s.key === d.key)
       onMouseLeaveStrand(d, idx, [...seqs])
+      this.stopMoveTracking(d, idx)
     }
 
     const handleClick = d => {

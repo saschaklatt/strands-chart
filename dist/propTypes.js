@@ -18,6 +18,7 @@ var widthPropType = PropTypes.number;
 var paddingPropType = PropTypes.number;
 var onMouseEnterPropType = PropTypes.func;
 var onMouseLeavePropType = PropTypes.func;
+var onMouseMovePropType = PropTypes.func;
 var onClickPropType = PropTypes.func;
 export var PeriodsPropTypes = {
   periods: periodsPropType.isRequired,
@@ -48,6 +49,7 @@ export var StrandsChartPropTypes = {
   height: heightPropType.isRequired,
   onMouseEnterStrand: onMouseEnterPropType,
   onMouseLeaveStrand: onMouseLeavePropType,
+  onMouseMove: onMouseMovePropType,
   onClickStrand: onClickPropType,
   periods: periodsPropType.isRequired,
   renderDate: renderDatePropType,

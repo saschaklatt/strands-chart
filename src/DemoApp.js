@@ -40,6 +40,15 @@ const SelectionBar = ({ sequences, selection = [], onChange }) => (
   </div>
 )
 
+const Tooltip = ({ position, item }) => (
+  <div
+    className="tooltip"
+    style={{ top: `${position[1]}px`, left: `${position[0]}px` }}
+  >
+    <p>{`Item: ${item.key}`}</p>
+  </div>
+)
+
 class App extends React.Component {
   constructor(props) {
     super(props)
@@ -60,6 +69,8 @@ class App extends React.Component {
     this.state = {
       sequences,
       periods,
+      position: null,
+      tooltipItem: null,
       selectedIndex: null,
       selection: sequences.map(getKey),
     }
@@ -76,7 +87,14 @@ class App extends React.Component {
 
   render() {
     const { width, height } = this.props
-    const { selection, selectedIndex, sequences, periods } = this.state
+    const {
+      selection,
+      selectedIndex,
+      sequences,
+      periods,
+      position,
+      tooltipItem,
+    } = this.state
     const visibleSequences = sequences.filter(s => selection.includes(s.key))
     // console.log("index", selectedIndex)
     return (
@@ -86,20 +104,27 @@ class App extends React.Component {
           selection={selection}
           onChange={this.handleSelectionChange}
         />
-        <StrandsChart
-          width={width}
-          height={height}
-          sequences={visibleSequences}
-          periods={periods}
-          renderPeriod={CustomPeriod}
-          onMouseEnterStrand={(d, i, seqs) => {
-            console.log("> seqs", seqs)
-            this.setState({ selectedIndex: i })
-          }}
-          onMouseLeaveStrand={() => this.setState({ selectedIndex: null })}
-          onClickStrand={(d, i) => console.log("click", d, i)}
-          selectedIdx={selectedIndex}
-        />
+        <div className={"chart-wrapper"}>
+          <StrandsChart
+            width={width}
+            height={height}
+            sequences={visibleSequences}
+            periods={periods}
+            renderPeriod={CustomPeriod}
+            onMouseEnterStrand={(d, i) => {
+              this.setState({ selectedIndex: i })
+            }}
+            onMouseLeaveStrand={() =>
+              this.setState({ selectedIndex: null, position: null })
+            }
+            onMouseMove={(position, tooltipItem) =>
+              this.setState({ position, tooltipItem })
+            }
+            onClickStrand={(d, i) => console.log("click", d, i)}
+            selectedIdx={selectedIndex}
+          />
+          {position && <Tooltip position={position} item={tooltipItem} />}
+        </div>
       </div>
     )
   }
