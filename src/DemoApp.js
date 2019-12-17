@@ -92,8 +92,11 @@ class App extends React.Component {
           sequences={visibleSequences}
           periods={periods}
           renderPeriod={CustomPeriod}
-          onMouseEnterStrand={(d, i) => this.setState({ selectedIndex: i })}
-          onMouseLeaveStrand={(d, i) => this.setState({ selectedIndex: null })}
+          onMouseEnterStrand={(d, i, seqs) => {
+            console.log("> seqs", seqs)
+            this.setState({ selectedIndex: i })
+          }}
+          onMouseLeaveStrand={() => this.setState({ selectedIndex: null })}
           onClickStrand={(d, i) => console.log("click", d, i)}
           selectedIdx={selectedIndex}
         />
