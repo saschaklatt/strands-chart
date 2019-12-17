@@ -122,19 +122,19 @@ class Strands extends React.Component {
     const handleMouseOver = d => {
       const seqs = this.getSequences()
       const idx = seqs.findIndex(s => s.key === d.key)
-      onMouseEnterStrand(d, idx, seqs)
+      onMouseEnterStrand(d, idx, [...seqs])
     }
 
     const handleMouseOut = d => {
       const seqs = this.getSequences()
       const idx = seqs.findIndex(s => s.key === d.key)
-      onMouseLeaveStrand(d, idx, seqs)
+      onMouseLeaveStrand(d, idx, [...seqs])
     }
 
     const handleClick = d => {
       const seqs = this.getSequences()
       const idx = seqs.findIndex(s => s.key === d.key)
-      onClickStrand(d, idx, seqs)
+      onClickStrand(d, idx, [...seqs])
     }
 
     const data = reverse(strands)
