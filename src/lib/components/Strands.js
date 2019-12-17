@@ -44,6 +44,11 @@ class Strands extends React.Component {
   constructor(props) {
     super(props)
     this.svg = React.createRef()
+    this.getSequences = this.getSequences.bind(this)
+  }
+
+  getSequences() {
+    return this.props.sequences
   }
 
   componentDidMount() {
@@ -106,7 +111,7 @@ class Strands extends React.Component {
       addClass(classNameHighlight).call(this)
     }
 
-    const lowlight = function() {
+    const resetHighlight = function() {
       const classNameLowlight = getClassNameLowlight()
       const classNameHighlight = getClassNameHighlight()
       const all = svg.selectAll("path")
@@ -114,17 +119,23 @@ class Strands extends React.Component {
       all.each(removeClass(classNameLowlight))
     }
 
-    const handleMouseOver = function(d, i) {
-      highlight.call(this, d, i)
-      onMouseEnterStrand(d, i)
+    const handleMouseOver = d => {
+      const seq = this.getSequences()
+      const idx = seq.findIndex(s => s.key === d.key)
+      onMouseEnterStrand(d, idx)
     }
 
-    const handleMouseOut = function(d, i) {
-      lowlight.call(this, d, i)
-      onMouseLeaveStrand(d, i)
+    const handleMouseOut = d => {
+      const seq = this.getSequences()
+      const idx = seq.findIndex(s => s.key === d.key)
+      onMouseLeaveStrand(d, idx)
     }
 
-    const handleClick = (d, i) => onClickStrand(d, i)
+    const handleClick = d => {
+      const seq = this.getSequences()
+      const idx = seq.findIndex(s => s.key === d.key)
+      onClickStrand(d, idx)
+    }
 
     const data = reverse(strands)
     const paths = svg.selectAll("path").data(data, getKey)
@@ -136,12 +147,13 @@ class Strands extends React.Component {
       .attr("fill", getColor)
       .attr("stroke-width", 0)
       .attr("d", newBornArea)
+      .on("click", handleClick)
       .on("mouseover", handleMouseOver)
       .on("mouseout", handleMouseOut)
-      .on("click", handleClick)
       .transition(tEnter)
       .attr("stroke-width", `${padding}px`)
       .attr("d", matureArea)
+      .selectAll("path")
 
     paths
       .merge(paths)
@@ -154,9 +166,8 @@ class Strands extends React.Component {
       .attr("d", deadArea)
       .remove()
 
-    if (isNil(selectedIdx)) {
-      lowlight()
-    } else {
+    resetHighlight()
+    if (!isNil(selectedIdx)) {
       const reverseIdx = data.length - 1 - selectedIdx
       highlight.call(getNodeByIndex(svg, reverseIdx))
     }

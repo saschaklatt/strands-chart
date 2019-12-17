@@ -60,6 +60,7 @@ class App extends React.Component {
     this.state = {
       sequences,
       periods,
+      selectedIndex: null,
       selection: sequences.map(getKey),
     }
   }
@@ -75,8 +76,9 @@ class App extends React.Component {
 
   render() {
     const { width, height } = this.props
-    const { selection, sequences, periods } = this.state
+    const { selection, selectedIndex, sequences, periods } = this.state
     const visibleSequences = sequences.filter(s => selection.includes(s.key))
+    // console.log("index", selectedIndex)
     return (
       <div className="App">
         <SelectionBar
@@ -90,9 +92,10 @@ class App extends React.Component {
           sequences={visibleSequences}
           periods={periods}
           renderPeriod={CustomPeriod}
-          onMouseEnterStrand={(d, i) => console.log("enter", d, i)}
-          onMouseLeaveStrand={(d, i) => console.log("leave", d, i)}
+          onMouseEnterStrand={(d, i) => this.setState({ selectedIndex: i })}
+          onMouseLeaveStrand={(d, i) => this.setState({ selectedIndex: null })}
           onClickStrand={(d, i) => console.log("click", d, i)}
+          selectedIdx={selectedIndex}
         />
       </div>
     )
