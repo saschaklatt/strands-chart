@@ -38,6 +38,10 @@ To start the demo, first install all dependecies, including peer-dependencies wi
 - onMouseLeaveStrand: Callback when mouse leaves a strand.
 - onClickStrand: Callback when a strand is clicked.
 
+## Styles
+
+You have to provide your own styles. An example can be found at `public/index.css`. Just use this file and adapt it to your needs.
+
 ## Data structure
 
 The chart uses two data sources: strands and periods.

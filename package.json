@@ -1,6 +1,6 @@
 {
   "name": "strands-chart",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Interactive and fully responsive diagram, based on React and D3, to compare values of different ranges over time in the form of strands. It's like a vertically stacked area chart where the areas are arranged alternately left and right around the y-axis.",
   "author": "Sascha Klatt",
   "license": "MIT",
