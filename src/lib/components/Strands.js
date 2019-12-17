@@ -1,4 +1,3 @@
-import "./StrandsChart.css"
 import React from "react"
 import noop from "lodash/noop"
 import isNil from "lodash/isNil"

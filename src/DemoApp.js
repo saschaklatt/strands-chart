@@ -1,3 +1,4 @@
+import "./lib/components/StrandsChart.css"
 import "./DemoApp.css"
 import React from "react"
 import StrandsChart, {

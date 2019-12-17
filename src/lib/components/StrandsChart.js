@@ -1,4 +1,3 @@
-import "./StrandsChart.css"
 import React from "react"
 import { curveMonotoneY } from "d3-shape"
 import { getBemClassName } from "../utils"

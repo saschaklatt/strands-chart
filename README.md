@@ -6,10 +6,14 @@ Interactive and fully responsive diagram, based on React and D3, to compare valu
 
 ## Install
 
-There's no npm version available yet. It can still be installed from GitHub by adding the following line to your dependencies in your package.json file:
+There's no npm version available yet. It can still be installed from GitHub by running
+
+    npm i --save klattiation/strands-chart
+
+or by manually adding the following line to your package.json's dependencies:
 
     "dependencies": {
-      "strands-chart": "klattiation/strands-chart",
+      "strands-chart": "github:klattiation/strands-chart"
       ...
     }
 
